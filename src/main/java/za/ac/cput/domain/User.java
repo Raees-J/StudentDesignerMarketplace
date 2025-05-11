@@ -1,3 +1,9 @@
+/*
+User.java
+Raees Johaadien(230558135)
+10 May 2025
+ */
+
 package za.ac.cput.domain;
 
 import java.util.UUID;
