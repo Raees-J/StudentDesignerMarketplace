@@ -22,12 +22,12 @@ public class User {
     protected User (){
 
     }
-    public User(UUID userId, String userName, String password, String email, String location) {
-        this.userId = userId;
-        this.userName = userName;
-        this.password = password;
-        this.email = email;
-        this.location = location;
+    public User(Builder builder) {
+        this.userId = builder.userId;
+        this.userName = builder.userName;
+        this.password = builder.password;
+        this.email = builder.email;
+        this.location = builder.location;
     }
 
     public UUID getUserId() {
@@ -60,4 +60,52 @@ public class User {
                 ", location='" + location + '\'' +
                 '}';
     }
+
+    public static class Builder {
+        private UUID userId;
+        private String userName;
+        private String password;
+        private String email;
+        private String location;
+
+        public Builder setUserId(UUID userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder setUserName(String userName) {
+            this.userName = userName;
+            return this;
+        }
+
+        public Builder setPassword(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public Builder setEmail(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder setLocation(String location) {
+            this.location = location;
+            return this;
+        }
+
+        public Builder copy(User user) {
+            this.userId = user.userId;
+            this.userName = user.userName;
+            this.password = user.password;
+            this.email = user.email;
+            this.location = user.location;
+            return this;
+        }
+
+        public User build() {
+            return new User(this);
+        }
+    }
+
+
 }
