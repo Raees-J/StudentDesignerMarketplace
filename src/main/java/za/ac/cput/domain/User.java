@@ -17,14 +17,18 @@ public class User {
 
     protected String password;
 
+    protected String role;
+
     protected User (){
 
     }
+
     public User(Builder builder) {
         this.userId = builder.userId;
         this.userName = builder.userName;
         this.email = builder.email;
         this.password = builder.password;
+        this.role = builder.role;
     }
 
     public UUID getUserId() {
@@ -43,6 +47,10 @@ public class User {
         return password;
     }
 
+    public String getRole() {
+        return role;
+    }
+
 
 
     @Override
@@ -52,6 +60,7 @@ public class User {
                 ", userName='" + userName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
                 '}';
     }
 
@@ -60,6 +69,7 @@ public class User {
         private String userName;
         private String email;
         private String password;
+        private String role;
 
 
         public Builder setUserId(UUID userId) {
@@ -82,6 +92,11 @@ public class User {
             return this;
         }
 
+        public Builder setRole(String role) {
+            this.role = role;
+            return this;
+        }
+
 
 
         public Builder copy(User user) {
@@ -89,6 +104,7 @@ public class User {
             this.userName = user.userName;
             this.email = user.email;
             this.password = user.password;
+            this.role = user.role;
             return this;
         }
 
