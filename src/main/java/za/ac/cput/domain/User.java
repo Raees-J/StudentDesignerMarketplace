@@ -13,11 +13,9 @@ public class User {
 
     protected String userName;
 
-    protected String password;
-
     protected String email;
 
-    protected String location;
+    protected String password;
 
     protected User (){
 
@@ -25,9 +23,8 @@ public class User {
     public User(Builder builder) {
         this.userId = builder.userId;
         this.userName = builder.userName;
-        this.password = builder.password;
         this.email = builder.email;
-        this.location = builder.location;
+        this.password = builder.password;
     }
 
     public UUID getUserId() {
@@ -38,35 +35,32 @@ public class User {
         return userName;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public String getEmail() {
         return email;
     }
 
-    public String getLocation() {
-        return location;
+    public String getPassword() {
+        return password;
     }
+
+
 
     @Override
     public String toString() {
         return "User{" +
                 "userId=" + userId +
                 ", userName='" + userName + '\'' +
-                ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
-                ", location='" + location + '\'' +
+                ", password='" + password + '\'' +
                 '}';
     }
 
     public static class Builder {
         private UUID userId;
         private String userName;
-        private String password;
         private String email;
-        private String location;
+        private String password;
+
 
         public Builder setUserId(UUID userId) {
             this.userId = userId;
@@ -78,27 +72,23 @@ public class User {
             return this;
         }
 
-        public Builder setPassword(String password) {
-            this.password = password;
-            return this;
-        }
-
         public Builder setEmail(String email) {
             this.email = email;
             return this;
         }
 
-        public Builder setLocation(String location) {
-            this.location = location;
+        public Builder setPassword(String password) {
+            this.password = password;
             return this;
         }
+
+
 
         public Builder copy(User user) {
             this.userId = user.userId;
             this.userName = user.userName;
-            this.password = user.password;
             this.email = user.email;
-            this.location = user.location;
+            this.password = user.password;
             return this;
         }
 
