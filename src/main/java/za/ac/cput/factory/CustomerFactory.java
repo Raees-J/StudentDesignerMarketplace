@@ -1,5 +1,5 @@
 package za.ac.cput.factory;
 
-public class UserFactoryTest {
+public class CustomerFactory {
 
 }
