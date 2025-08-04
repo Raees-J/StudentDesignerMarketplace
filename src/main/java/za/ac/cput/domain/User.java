@@ -7,6 +7,8 @@ Raees Johaadien(230558135)
 package za.ac.cput.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.util.UUID;
@@ -14,6 +16,7 @@ import java.util.UUID;
 @Entity
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected UUID userId;
 
     protected String userName;

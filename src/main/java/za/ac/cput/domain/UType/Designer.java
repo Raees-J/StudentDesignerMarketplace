@@ -7,6 +7,7 @@ public class Designer extends User {
 
     public Designer(Builder builder) {
 
+
     }
 
     public Designer(String portfolioURL) {
@@ -27,8 +28,9 @@ public class Designer extends User {
     public static class Builder {
         private String portfolioURL;
 
-        public void setPortfolioURL(String portfolioURL) {
+        public Builder setPortfolioURL(String portfolioURL) {
             this.portfolioURL = portfolioURL;
+            return this;
         }
 
         public Builder copy(Designer designer) {

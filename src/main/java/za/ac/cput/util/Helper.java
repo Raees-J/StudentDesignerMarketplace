@@ -1,6 +1,7 @@
 package za.ac.cput.util;
 
 import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.commons.validator.routines.UrlValidator;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -24,16 +25,22 @@ public class Helper {
         }
     }
 
-    boolean isValidURL(String url) throws MalformedURLException, URISyntaxException {
-        try {
-            new URL(url).toURI();
+
+    public static boolean isValidURL(String url) throws MalformedURLException {
+        UrlValidator validator = new UrlValidator();
+        if(validator.isValid(url)){
             return true;
-        } catch (MalformedURLException e) {
-            return false;
-        } catch (URISyntaxException e) {
+        }else {
             return false;
         }
     }
 
-
+    public static boolean isValidPaymentMethod(String paymentMethod) {
+        if (paymentMethod == null || paymentMethod.isEmpty()) {
+            return false;
+        }
+        return paymentMethod.equalsIgnoreCase("Card") ||
+                paymentMethod.equalsIgnoreCase("Cash") ||
+                paymentMethod.equalsIgnoreCase("Online");
+    }
 }
