@@ -1,5 +1,18 @@
 package za.ac.cput.factory;
 
-public class CustomerFactory {
+import za.ac.cput.domain.UType.Customer;
+import za.ac.cput.util.Helper;
 
+public class CustomerFactory {
+    public static Customer createCustomer(String paymentMethod, double amount) {
+        if (!Helper.isValidPaymentMethod(paymentMethod)) {
+            throw new IllegalArgumentException("Invalid payment method. Allowed: Card, Cash, Online.");
+        }
+
+
+        return new Customer.Builder()
+                .setPaymentMethod(paymentMethod)
+                .setAmount(amount)
+                .build();
+    }
 }
