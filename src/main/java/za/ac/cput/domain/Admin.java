@@ -1,39 +1,37 @@
-/*
-Admin.java
-Justin Angelo Karoles (222008237)
-14 July 2025
-*/
-
 package za.ac.cput.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.UUID;
 
 @Entity
 public class Admin {
-
     @Id
-    protected UUID adminId;
+    private UUID adminId;
 
-    @Email
-    @NotBlank
-    protected String email;
+    @NotBlank(message = "Name is required.")
+    private String name;
 
-    @NotBlank
-    protected String password;
+    @NotBlank(message = "Surname is required.")
+    private String surname;
 
-    protected String fullName;
+    @Email(message = "Email should be valid.")
+    @NotBlank(message = "Email is required.")
+    private String email;
+
+    @NotBlank(message = "Password is required.")
+    private String password;
 
     protected Admin() {
-        // JPA default constructor
     }
 
-    public Admin(UUID adminId, String fullName, String email, String password) {
+    public Admin(UUID adminId, String name, String surname, String email, String password) {
         this.adminId = adminId;
-        this.fullName = fullName;
+        this.name = name;
+        this.surname = surname;
         this.email = email;
         this.password = password;
     }
@@ -42,8 +40,16 @@ public class Admin {
         return adminId;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
     public String getFullName() {
-        return fullName;
+        return name + " " + surname;
     }
 
     public String getEmail() {
@@ -58,7 +64,8 @@ public class Admin {
     public String toString() {
         return "Admin{" +
                 "adminId=" + adminId +
-                ", fullName='" + fullName + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 '}';
