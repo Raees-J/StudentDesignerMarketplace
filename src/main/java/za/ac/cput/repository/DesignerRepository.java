@@ -5,8 +5,9 @@ import org.springframework.stereotype.Repository;
 import za.ac.cput.domain.UType.Designer;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface DesignerRepository extends JpaRepository<Designer, String> {
-   List<Designer> findDesignerByPortfolioURL(String portfolioURL);
+public interface DesignerRepository extends JpaRepository<Designer, UUID> {
+   List<Designer> findByPortfolioURLContaining(String keyword);
 }

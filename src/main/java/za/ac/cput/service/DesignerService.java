@@ -7,55 +7,55 @@ import za.ac.cput.repository.DesignerRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
-public class DesignerService implements IDesignerService{
+public class DesignerService implements IDesignerService {
 
     private final DesignerRepository repository;
+
     @Autowired
     public DesignerService(DesignerRepository repository) {
         this.repository = repository;
     }
+
     @Override
     public Designer create(Designer designer) {
         return repository.save(designer);
     }
+
     @Override
-    public Designer read(String id) {
+    public Designer read(UUID id) {
         Optional<Designer> optionalDesigner = repository.findById(id);
         return optionalDesigner.orElse(null);
     }
 
     @Override
     public Designer update(Designer designer) {
-        if (repository.existsById(designer.getPortfolioURL())) { // Assuming portfolioURL is the ID for simplicity
+        if (designer.getUserId() != null && repository.existsById(designer.getUserId())) {
             return repository.save(designer);
         }
-        return null; // Or throw an exception if the designer doesn't exist
+        return null;
     }
+
     @Override
-    public boolean delete(String id) {
+    public boolean delete(UUID id) {
         if (repository.existsById(id)) {
             repository.deleteById(id);
             return true;
         }
         return false;
     }
+
     @Override
     public List<Designer> getAll() {
         return repository.findAll();
     }
 
     @Override
-    public List<Designer> findDesignersByPortfolioURLContaining(String keyword) {
-        // This method would require a custom query in the DesignerRepository
-        // For now, we'll just return all designers and filter in memory (not efficient for large datasets)
-        // In a real application, you'd add a method like:
-        // List<Designer> findByPortfolioURLContaining(String keyword); to DesignerRepository
+    public List<Designer> findDesignerByPortfolioURLContaining(String keyword) {
         return repository.findAll().stream()
                 .filter(designer -> designer.getPortfolioURL() != null && designer.getPortfolioURL().contains(keyword))
                 .toList();
     }
-
-
 }

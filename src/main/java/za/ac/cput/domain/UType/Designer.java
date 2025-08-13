@@ -1,17 +1,22 @@
 package za.ac.cput.domain.UType;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import za.ac.cput.domain.User;
+
+@Entity
+@PrimaryKeyJoinColumn(name = "userId")
 
 public class Designer extends User {
     private String portfolioURL;
 
-    public Designer(Builder builder) {
-
+    protected Designer() {
 
     }
 
-    public Designer(String portfolioURL) {
-        this.portfolioURL = portfolioURL;
+    public Designer(Builder builder) {
+        super(builder.userName, builder.email, builder.password, builder.role);
+        this.portfolioURL = builder.portfolioURL;
     }
 
     public String getPortfolioURL() {
@@ -26,7 +31,31 @@ public class Designer extends User {
     }
 
     public static class Builder {
+        private String userName;
+        private String email;
+        private String password;
+        private String role;
         private String portfolioURL;
+
+        public Builder setUserName(String userName) {
+            this.userName = userName;
+            return this;
+        }
+
+        public Builder setEmail(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder setPassword(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public Builder setRole(String role) {
+            this.role = role;
+            return this;
+        }
 
         public Builder setPortfolioURL(String portfolioURL) {
             this.portfolioURL = portfolioURL;
