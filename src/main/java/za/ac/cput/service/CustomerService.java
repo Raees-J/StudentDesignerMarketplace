@@ -7,6 +7,7 @@ import za.ac.cput.repository.CustomerRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CustomerService implements ICustomerService {
@@ -24,39 +25,33 @@ public class CustomerService implements ICustomerService {
     }
 
     @Override
-    public Customer read(String id) {
-        Optional<Customer> optionalCustomer = repository.findById(id);
-        return optionalCustomer.orElse(null);
-}
+    public Customer read(UUID id) {
+        return repository.findById(id).orElse(null);
+    }
 
     @Override
     public Customer update(Customer customer) {
-        if (repository.existsById(customer.getPaymentMethod())) {
+        if (repository.existsById(customer.getUserId())) {
             return repository.save(customer);
         }
         return null;
     }
 
     @Override
-    public boolean delete(String id) {
-        if (repository.existsById(id)) {
+    public boolean delete(UUID id) {
         repository.deleteById(id);
-        return true;
-        }
-        return false;
+        return !repository.existsById(id);
     }
+
     @Override
     public List<Customer> getAll() {
         return repository.findAll();
     }
+
     @Override
-    public List<Customer> findCustomersByPaymentMethod(String paymentMethod) {
-    // This method would require a custom query in the CustomerRepository
-    // For now, we'll just return all customers and filter in memory (not efficient for large datasets)
-    // In a real application, you'd add a method like:
-    // List<Customer> findByPaymentMethod(String paymentMethod); to CustomerRepository
-    return repository.findAll().stream()
-            .filter(customer -> customer.getPaymentMethod().equalsIgnoreCase(paymentMethod))
-            .toList();
+    public List<Customer> findByPaymentMethod(String paymentMethod){
+        return repository.findByPaymentMethod(paymentMethod);
+        }
     }
-}
+
+

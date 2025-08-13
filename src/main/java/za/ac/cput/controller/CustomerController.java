@@ -6,10 +6,13 @@ import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.UType.Customer;
 import za.ac.cput.service.CustomerService;
 import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/customer")
 public class CustomerController {
     private final CustomerService customerService;
+
     @Autowired
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
@@ -20,7 +23,7 @@ public class CustomerController {
         return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
     }
     @GetMapping("/read/{id}")
-    public ResponseEntity<Customer> read(@PathVariable String id) {
+    public ResponseEntity<Customer> read(@PathVariable UUID id) {
         Customer customer = customerService.read(id);
         if (customer != null) {
             return new ResponseEntity<>(customer, HttpStatus.OK);
@@ -36,7 +39,7 @@ public class CustomerController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         boolean deleted = customerService.delete(id);
         if (deleted) {
             return new ResponseEntity<>(HttpStatus.OK);
@@ -50,7 +53,7 @@ public class CustomerController {
     }
     @GetMapping("/findByPaymentMethod")
     public ResponseEntity<List<Customer>> findByPaymentMethod(@RequestParam String paymentMethod) {
-        List<Customer> customers = customerService.findCustomersByPaymentMethod(paymentMethod);
+        List<Customer> customers = customerService.findByPaymentMethod(paymentMethod);
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 }

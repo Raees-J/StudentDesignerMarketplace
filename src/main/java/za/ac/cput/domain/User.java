@@ -6,17 +6,16 @@ Raees Johaadien(230558135)
 
 package za.ac.cput.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     protected UUID userId;
 
     protected String userName;
@@ -31,8 +30,7 @@ public class User {
 
     }
 
-    public User(UUID userId, String userName, String email, String password, String role) {
-        this.userId = userId;
+    public User(String userName, String email, String password, String role) {
         this.userName = userName;
         this.email = email;
         this.password = password;
