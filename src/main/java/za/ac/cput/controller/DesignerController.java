@@ -6,10 +6,13 @@ import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.UType.Designer;
 import za.ac.cput.service.DesignerService;
 import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/designer")
 public class DesignerController {
     private final DesignerService designerService;
+
     @Autowired
     public DesignerController(DesignerService designerService) {
         this.designerService = designerService;
@@ -20,7 +23,7 @@ public class DesignerController {
         return new ResponseEntity<>(createdDesigner, HttpStatus.CREATED);
     }
     @GetMapping("/read/{id}")
-    public ResponseEntity<Designer> read(@PathVariable String id) {
+    public ResponseEntity<Designer> read(@PathVariable UUID id) {
         Designer designer = designerService.read(id);
         if (designer != null) {
             return new ResponseEntity<>(designer, HttpStatus.OK);
@@ -36,7 +39,7 @@ public class DesignerController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         boolean deleted = designerService.delete(id);
         if (deleted) {
             return new ResponseEntity<>(HttpStatus.OK);
@@ -50,7 +53,7 @@ public class DesignerController {
     }
     @GetMapping("/findByPortfolioURLContaining")
     public ResponseEntity<List<Designer>> findByPortfolioURLContaining(@RequestParam String keyword) {
-        List<Designer> designers = designerService.findDesignersByPortfolioURLContaining(keyword);
+        List<Designer> designers = designerService.findDesignerByPortfolioURLContaining(keyword);
         return new ResponseEntity<>(designers, HttpStatus.OK);
     }
 }
