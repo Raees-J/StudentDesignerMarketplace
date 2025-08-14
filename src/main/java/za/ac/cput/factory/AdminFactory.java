@@ -1,26 +1,34 @@
+/**
+ * Author: Justin Angelo Karoles (222008237)
+ * Date: August 2025
+ */
+
 package za.ac.cput.factory;
 
-import za.ac.cput.domain.UType.Admin;
-import java.util.UUID;
+import za.ac.cput.domain.Admin;
+import za.ac.cput.util.Helper;
 
 public class AdminFactory {
+    public static Admin buildAdmin(String firstName, String lastName,
+                                   String email, String password) {
 
-    public static Admin createAdmin(String userName, String email, String password, String firstName, String lastName) {
-        if (isNullOrEmpty(userName) || isNullOrEmpty(email) || isNullOrEmpty(password) || isNullOrEmpty(firstName) || isNullOrEmpty(lastName)) {
-            throw new IllegalArgumentException("All fields are required and must not be null or empty");
+        if (Helper.isNullorEmpty(firstName) || Helper.isNullorEmpty(lastName) ||
+                Helper.isNullorEmpty(email) || Helper.isNullorEmpty(password) ) {
+            return null;
+        }
+
+        if (!Helper.isValidEmail(email)) {
+            throw new IllegalArgumentException("Invalid email format");
         }
 
         return new Admin.Builder()
-                .setUserId(UUID.randomUUID())
-                .setUserName(userName)
+                .setFirstName(firstName)
+                .setLastName(lastName)
                 .setEmail(email)
                 .setPassword(password)
-                .setRole("ADMIN") // assuming role is fixed
-                .setAdminLevel("Standard") // or pass this as a parameter
+                .setRole("ADMIN")
                 .build();
     }
-
-    private static boolean isNullOrEmpty(String value) {
-        return value == null || value.trim().isEmpty();
-    }
 }
+
+
