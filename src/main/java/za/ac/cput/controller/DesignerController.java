@@ -17,11 +17,13 @@ public class DesignerController {
     public DesignerController(DesignerService designerService) {
         this.designerService = designerService;
     }
+
     @PostMapping("/create")
     public ResponseEntity<Designer> create(@RequestBody Designer designer) {
         Designer createdDesigner = designerService.create(designer);
         return new ResponseEntity<>(createdDesigner, HttpStatus.CREATED);
     }
+
     @GetMapping("/read/{id}")
     public ResponseEntity<Designer> read(@PathVariable UUID id) {
         Designer designer = designerService.read(id);
@@ -30,6 +32,7 @@ public class DesignerController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
     @PutMapping("/update")
     public ResponseEntity<Designer> update(@RequestBody Designer designer) {
         Designer updatedDesigner = designerService.update(designer);
@@ -38,6 +41,7 @@ public class DesignerController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         boolean deleted = designerService.delete(id);
@@ -46,11 +50,13 @@ public class DesignerController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
     @GetMapping("/getAll")
     public ResponseEntity<List<Designer>> getAll() {
         List<Designer> designers = designerService.getAll();
         return new ResponseEntity<>(designers, HttpStatus.OK);
     }
+
     @GetMapping("/findByPortfolioURLContaining")
     public ResponseEntity<List<Designer>> findByPortfolioURLContaining(@RequestParam String keyword) {
         List<Designer> designers = designerService.findDesignerByPortfolioURLContaining(keyword);

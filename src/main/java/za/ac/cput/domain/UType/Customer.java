@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import za.ac.cput.domain.User;
 
-import java.lang.module.ModuleDescriptor;
 @Entity
 @PrimaryKeyJoinColumn(name = "userId")
 public class Customer extends User {
