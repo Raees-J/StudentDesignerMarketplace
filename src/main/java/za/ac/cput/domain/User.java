@@ -18,8 +18,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     protected UUID userId;
 
-    protected String userName;
-
     protected String email;
 
     protected String password;
@@ -30,8 +28,7 @@ public class User {
 
     }
 
-    public User(String userName, String email, String password, String role) {
-        this.userName = userName;
+    public User(String email, String password, String role) {
         this.email = email;
         this.password = password;
         this.role = role;
@@ -39,10 +36,6 @@ public class User {
 
     public UUID getUserId() {
         return userId;
-    }
-
-    public String getUserName() {
-        return userName;
     }
 
     public String getEmail() {
@@ -63,7 +56,6 @@ public class User {
     public String toString() {
         return "User{" +
                 "userId=" + userId +
-                ", userName='" + userName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +

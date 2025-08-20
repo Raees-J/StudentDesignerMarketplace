@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface ICustomerService extends IService <Customer, UUID> {
     List<Customer> findByPaymentMethod(String paymentMethod);
     List<Customer> getAll();
+    Customer login(String email, String password);
 }

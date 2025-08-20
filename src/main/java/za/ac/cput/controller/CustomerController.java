@@ -56,4 +56,12 @@ public class CustomerController {
         List<Customer> customers = customerService.findByPaymentMethod(paymentMethod);
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
+    @PostMapping("/login")
+    public ResponseEntity<Customer> login(@RequestBody Customer loginRequest) {
+        Customer customer = customerService.login(loginRequest.getEmail(), loginRequest.getPassword());
+        if (customer != null) {
+            return new ResponseEntity<>(customer, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
 }

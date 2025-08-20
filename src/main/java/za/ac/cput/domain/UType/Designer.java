@@ -15,7 +15,7 @@ public class Designer extends User {
     }
 
     public Designer(Builder builder) {
-        super(builder.userName, builder.email, builder.password, builder.role);
+        super(builder.email, builder.password, builder.role);
         this.portfolioURL = builder.portfolioURL;
     }
 
@@ -31,16 +31,10 @@ public class Designer extends User {
     }
 
     public static class Builder {
-        private String userName;
         private String email;
         private String password;
         private String role;
         private String portfolioURL;
-
-        public Builder setUserName(String userName) {
-            this.userName = userName;
-            return this;
-        }
 
         public Builder setEmail(String email) {
             this.email = email;
