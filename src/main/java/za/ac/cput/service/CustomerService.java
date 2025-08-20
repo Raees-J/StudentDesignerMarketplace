@@ -52,6 +52,9 @@ public class CustomerService implements ICustomerService {
     public List<Customer> findByPaymentMethod(String paymentMethod){
         return repository.findByPaymentMethod(paymentMethod);
         }
+
+    @Override
+    public Customer login(String email, String password) {
+        return repository.findByEmailAndPassword(email, password);
     }
-
-
+}

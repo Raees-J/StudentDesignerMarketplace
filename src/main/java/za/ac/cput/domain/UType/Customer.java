@@ -13,26 +13,20 @@ public class Customer extends User {
     protected Customer() {}
 
     public Customer(Builder builder) {
-        super(builder.userName, builder.email, builder.password, builder.role);
+        super(builder.email, builder.password, builder.role);
         this.paymentMethod = builder.paymentMethod;
         this.amount = builder.amount;
-
     }
     public String getPaymentMethod() { return paymentMethod; }
 
     public double getAmount() { return amount; }
 
     public static class Builder {
-        private String userName;
         private String email;
         private String password;
         private String role;
         private String paymentMethod;
         private double amount;
-
-        public Builder setUserName(String userName)
-        { this.userName = userName;
-            return this; }
 
         public Builder setEmail(String email)
         { this.email = email;
@@ -57,8 +51,3 @@ public class Customer extends User {
         public Customer build() { return new Customer(this); }
     }
 }
-
-
-
-
-
