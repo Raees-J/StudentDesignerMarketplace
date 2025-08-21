@@ -9,5 +9,6 @@ import za.ac.cput.domain.Review;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, String> {
 
+
 }
 
