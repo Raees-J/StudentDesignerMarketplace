@@ -50,26 +50,23 @@ const Home: React.FC = () => {
                   Shop Now
                   <ArrowRight size={20} />
                 </Link>
-                <Link to="/products/apparel" className="btn btn-outline" style={{
-                  borderColor: 'white',
-                  color: 'white',
-                  padding: '1rem 2rem',
-                  fontSize: '1rem'
-                }}>
-                  View Apparel
-                </Link>
               </div>
             </div>
-            <div style={{ textAlign: 'center' }}>
+            <div style={{
+              width: '100%',
+              height: 'auto',
+              overflow: 'hidden',
+              borderRadius: '1rem',
+              boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+            }}>
               <img
-                src="https://images.pexels.com/photos/5428836/pexels-photo-5428836.jpeg"
-                alt="University Students"
-                style={{
-                  width: '100%',
-                  maxWidth: '500px',
-                  borderRadius: '1rem',
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
-                }}
+                  src="https://www.careersportal.co.za/sites/default/files/styles/max_2600x2600/public/cput.jpg?itok=q16kYMtW"
+                  alt="CPUT Banner"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    objectFit: 'cover'
+                  }}
               />
             </div>
           </div>
