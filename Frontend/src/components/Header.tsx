@@ -59,17 +59,11 @@ const Header: React.FC = () => {
               <Link to="/products" style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '500' }}>
                 All Products
               </Link>
-              <Link to="/products/apparel" style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '500' }}>
-                Apparel
+              <Link to="/contact" style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '500' }}>
+                Contact Us
               </Link>
-              <Link to="/products/furniture" style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '500' }}>
-                Furniture
-              </Link>
-              <Link to="/products/outdoor" style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '500' }}>
-                Outdoor
-              </Link>
-              <Link to="/products/accessories" style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '500' }}>
-                Accessories
+              <Link to="/about" style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '500' }}>
+                About Us
               </Link>
             </div>
           </nav>

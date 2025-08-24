@@ -18,6 +18,8 @@ import ProductDetail from './pages/ProductDetail';
 import Products from './pages/Products';
 import Profile from './pages/Profile';
 import Register from './pages/Register';
+import Contact from './pages/Contact';
+import About from './pages/About';
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/admin-login" element={<AdminLogin />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/about" element={<About />} />
                 <Route 
                   path="/admin" 
                   element={

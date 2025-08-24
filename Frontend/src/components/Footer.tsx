@@ -58,11 +58,11 @@ const Footer: React.FC = () => {
                 <Link to="/products" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '0.875rem' }}>
                   Products
                 </Link>
-                <Link to="/products/apparel" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '0.875rem' }}>
+                <Link to="/about" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '0.875rem' }}>
                   About us
                 </Link>
-                <Link to="/cart" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '0.875rem' }}>
-                  Shopping Cart
+                <Link to="/contact" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '0.875rem' }}>
+                  Contact Us
                 </Link>
               </div>
             </div>

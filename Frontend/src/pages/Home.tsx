@@ -35,9 +35,7 @@ const Home: React.FC = () => {
                 marginBottom: '2rem',
                 opacity: 0.9
               }}>
-                Discover premium quality apparel, furniture, and accessories 
-                representing our university. From comfortable study chairs to 
-                branded clothing and event equipment.
+                Official merchandise and supplies from the University Marketing Department. Quality products for students, staff, and alumni.
               </p>
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 <Link to="/products" className="btn btn-primary" style={{
@@ -50,23 +48,26 @@ const Home: React.FC = () => {
                   Shop Now
                   <ArrowRight size={20} />
                 </Link>
+                <Link to="/products/apparel" className="btn btn-outline" style={{
+                  borderColor: 'white',
+                  color: 'white',
+                  padding: '1rem 2rem',
+                  fontSize: '1rem'
+                }}>
+                  View Apparel
+                </Link>
               </div>
             </div>
-            <div style={{
-              width: '100%',
-              height: 'auto',
-              overflow: 'hidden',
-              borderRadius: '1rem',
-              boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
-            }}>
+            <div style={{ textAlign: 'center' }}>
               <img
-                  src="https://www.careersportal.co.za/sites/default/files/styles/max_2600x2600/public/cput.jpg?itok=q16kYMtW"
-                  alt="CPUT Banner"
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    objectFit: 'cover'
-                  }}
+                src="assets\images\Logo.png"
+                alt="University Students"
+                style={{
+                  width: '100%',
+                  maxWidth: '500px',
+                  borderRadius: '1rem',
+                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+                }}
               />
             </div>
           </div>
