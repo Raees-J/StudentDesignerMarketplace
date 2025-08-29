@@ -15,8 +15,8 @@ export const products: Product[] = [
   // Apparel
   {
     id: '1',
-    name: 'University Logo T-Shirt',
-    description: 'Premium cotton t-shirt with embroidered university logo. Perfect for students and alumni.',
+    name: 'Dress with skirt',
+    description: 'Premium cotton dress with stylish skirt. Perfect for students and alumni.',
     price: 299,
     image: '/assets/images/outfit 1.jpg',
     category: 'apparel',
@@ -27,31 +27,31 @@ export const products: Product[] = [
   },
   {
     id: '2',
-    name: 'University Hoodie',
-    description: 'Comfortable fleece hoodie with university branding. Ideal for cooler weather.',
+    name: 'Coat with hoodie',
+    description: 'Comfortable fleece coat with attachable hoodie. Ideal for cooler weather.',
     price: 599,
     image: '/assets/images/outfit 2.jpg',
     category: 'apparel',
     inStock: true,
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    colors: ['Navy', 'Grey', 'Black'],
+    colors: ['brown', 'Grey', 'Black'],
     features: ['80% Cotton 20% Polyester', 'Kangaroo Pocket', 'Drawstring Hood']
   },
   {
     id: '3',
-    name: 'University Baseball Cap',
-    description: 'Adjustable baseball cap with embroidered university logo.',
+    name: 'Stylish outfit',
+    description: 'Adjustable 2 piece .',
     price: 199,
     image: '/assets/images/outfit 3.jpg',
     category: 'apparel',
     inStock: true,
-    colors: ['Navy', 'White', 'Black'],
+    colors: ['green', 'White', 'Black'],
     features: ['Adjustable Strap', 'Curved Brim', 'Breathable Fabric']
   },
   {
     id: '4',
-    name: 'University Polo Shirt',
-    description: 'Professional polo shirt perfect for university events and casual wear.',
+    name: 'Bowtie and waistband',
+    description: 'Essential add on to your suit or shirt.',
     price: 399,
     image: '/assets/images/bowtie.jpeg',
     category: 'apparel',
@@ -61,22 +61,21 @@ export const products: Product[] = [
     features: ['Moisture Wicking', 'Collar Stay', 'Side Vents']
   },
 
-  // Furniture/Chairs
+  // Furniture
   {
     id: '5',
-    name: 'Ergonomic Study Chair',
-    description: 'Comfortable ergonomic chair designed for long study sessions.',
+    name: 'Framed poster',
+    description: 'Stylish arabic text poster/ artwork.',
     price: 2499,
     image: '/assets/images/poster.jpg',
     category: 'furniture',
     inStock: true,
-    colors: ['Black', 'Grey', 'Blue'],
-    features: ['Lumbar Support', 'Adjustable Height', 'Swivel Base', '5-Year Warranty']
+    features: [ '5-Year Warranty']
   },
   {
     id: '6',
-    name: 'Lecture Hall Chair',
-    description: 'Stackable chair perfect for events and lectures.',
+    name: 'Forge',
+    description: 'hang all items from keys to bottles to coats.',
     price: 899,
     image: '/assets/images/wallHanger.png',
     category: 'furniture',
@@ -86,56 +85,34 @@ export const products: Product[] = [
   },
   {
     id: '7',
-    name: 'Executive Office Chair',
-    description: 'Premium leather office chair for administrative use.',
+    name: 'Coffea machine ',
+    description: 'ideal houshold product for everyday coffea.',
     price: 4999,
     image: '/assets/images/coffeaMach.jpg',
     category: 'furniture',
     inStock: true,
     colors: ['Black', 'Brown'],
-    features: ['Genuine Leather', 'High Back', 'Pneumatic Height Adjustment']
+  
   },
 
   // Tents/Outdoor
   {
     id: '8',
-    name: 'University Event Tent 3x3m',
-    description: 'Professional pop-up tent for university events and outdoor activities.',
+    name: 'watertank bag',
+    description: 'Hikes, walks in the park, to even spring and marathons.Drink while working out .',
     price: 1899,
     image: '/assets/images/condo-3L.jpg',
     category: 'outdoor',
     inStock: true,
-    colors: ['White', 'Blue', 'Red'],
     features: ['Waterproof', 'UV Protection', 'Easy Setup', 'Carrying Bag Included']
   },
-  {
-    id: '9',
-    name: 'Camping Tent 4-Person',
-    description: 'Durable camping tent perfect for university outdoor programs.',
-    price: 1299,
-    image: 'https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg',
-    category: 'outdoor',
-    inStock: true,
-    colors: ['Green', 'Orange', 'Blue'],
-    features: ['Sleeps 4', 'Waterproof', 'Ventilation Windows', 'Ground Tarp Included']
-  },
-  {
-    id: '10',
-    name: 'Market Stall Tent 6x3m',
-    description: 'Large commercial tent for university market days and fairs.',
-    price: 3499,
-    image: 'https://images.pexels.com/photos/1687845/pexels-photo-1687845.jpeg',
-    category: 'outdoor',
-    inStock: true,
-    colors: ['White', 'Blue'],
-    features: ['Heavy Duty Frame', 'Sidewalls Included', 'Professional Grade', 'Wind Resistant']
-  },
+  
 
   // Accessories
   {
     id: '11',
-    name: 'University Laptop Bag',
-    description: 'Padded laptop bag with university branding.',
+    name: 'Laptop Bag',
+    description: 'Padded laptop bag.',
     price: 699,
     image: '/assets/images/Brownbag.jpeg',
     category: 'accessories',
@@ -145,41 +122,38 @@ export const products: Product[] = [
   },
   {
     id: '12',
-    name: 'University Water Bottle',
-    description: 'Stainless steel water bottle with university logo.',
+    name: 'duffle bag',
+    description: 'Multiple compartment for everyday use.',
     price: 249,
     image: '/assets/images/ChocBag.jpeg',
     category: 'accessories',
     inStock: true,
-    colors: ['Silver', 'Blue', 'Black'],
-    features: ['500ml Capacity', 'Insulated', 'Leak Proof', 'BPA Free']
   },
   {
     id: '13',
-    name: 'University Laptop Bag',
-    description: 'Padded laptop bag with university branding.',
-    price: 699,
+    name: 'University Diary',
+    description: 'old school ook for your newst thoughts and designs.',
+    price: 199,
     image: '/assets/images/Diary.jpeg',
     category: 'accessories',
     inStock: true,
     colors: ['Black', 'Navy', 'Grey'],
-    features: ['Fits 15" Laptop', 'Multiple Compartments', 'Shoulder Strap']
+
   },
   {
     id: '14',
-    name: 'University Laptop Bag',
+    name: 'University Bag',
     description: 'Padded laptop bag with university branding.',
-    price: 699,
+    price: 350,
     image: '/assets/images/DoublestBag.jpeg',
     category: 'accessories',
     inStock: true,
     colors: ['Black', 'Navy', 'Grey'],
-    features: ['Fits 15" Laptop', 'Multiple Compartments', 'Shoulder Strap']
-  },
+    },
   {
     id: '15',
-    name: 'University Laptop Bag',
-    description: 'Padded laptop bag with university branding.',
+    name: 'GreenBag',
+    description: 'stylish and comfortable.',
     price: 699,
     image: '/assets/images/Greenbag.jpeg',
     category: 'accessories',
@@ -189,70 +163,63 @@ export const products: Product[] = [
   },
   {
     id: '16',
-    name: 'University Laptop Bag',
-    description: 'Padded laptop bag with university branding.',
+    name: ' handBag',
+    description: 'easy use and carry.',
     price: 699,
     image: '/assets/images/handBag.jpeg',
     category: 'accessories',
     inStock: true,
     colors: ['Black', 'Navy', 'Grey'],
-    features: ['Fits 15" Laptop', 'Multiple Compartments', 'Shoulder Strap']
-  },
+     },
   {
     id: '17',
-    name: 'University Laptop Bag',
-    description: 'Padded laptop bag with university branding.',
-    price: 699,
+    name: 'headphones',
+    description: 'listen to whatever you want to whenever you want to.',
+    price: 250,
     image: '/assets/images/headphones.png',
     category: 'accessories',
     inStock: true,
     colors: ['Black', 'Navy', 'Grey'],
-    features: ['Fits 15" Laptop', 'Multiple Compartments', 'Shoulder Strap']
-  },
+      },
   {
     id: '18',
-    name: 'University Laptop Bag',
-    description: 'Padded laptop bag with university branding.',
-    price: 699,
+    name: 'Lamp',
+    description: 'studying in the dark to being able to use as a nightlight .',
+    price: 299,
     image: '/assets/images/lamp.png',
     category: 'accessories',
     inStock: true,
-    colors: ['Black', 'Navy', 'Grey'],
-    features: ['Fits 15" Laptop', 'Multiple Compartments', 'Shoulder Strap']
-  },
+     },
   {
     id: '19',
-    name: 'University Laptop Bag',
-    description: 'Padded laptop bag with university branding.',
+    name: 'Leather bag',
+    description: 'Padded bag with classic design.',
     price: 699,
     image: '/assets/images/leatherBg.jpeg',
     category: 'accessories',
     inStock: true,
     colors: ['Black', 'Navy', 'Grey'],
-    features: ['Fits 15" Laptop', 'Multiple Compartments', 'Shoulder Strap']
+    features: [ 'Multiple Compartments', 'Shoulder Strap']
   },
   {
     id: '20',
-    name: 'University Laptop Bag',
-    description: 'Padded laptop bag with university branding.',
-    price: 699,
+    name: 'wallet',
+    description: 'keep your student card, cash and other valuables in.',
+    price: 99,
     image: '/assets/images/wallet.jpeg',
     category: 'accessories',
     inStock: true,
     colors: ['Black', 'Navy', 'Grey'],
-    features: ['Fits 15" Laptop', 'Multiple Compartments', 'Shoulder Strap']
-  },
+      },
   {
     id: '21',
-    name: 'University Laptop Bag',
-    description: 'Padded laptop bag with university branding.',
-    price: 699,
+    name: 'speaker',
+    description: 'listen to podcast and music anywhere.',
+    price: 499,
     image: '/assets/images/Speaker render 1.png',
     category: 'accessories',
     inStock: true,
-    colors: ['Black', 'Navy', 'Grey'],
-    features: ['Fits 15" Laptop', 'Multiple Compartments', 'Shoulder Strap']
-  }
+     }
 
 
 ]
