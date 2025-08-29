@@ -1,94 +1,136 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import axiosInstance from '../api/axiosInstance';
-import { createCustomer } from '../api/profileApi';
+import { loginAdmin, loginCustomer, registerCustomer } from '../api/profileApi';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  firstName?: string;
+  lastName?: string;
+  role: 'admin' | 'user' | 'superadmin';
+}
 
 interface AuthContextType {
-  currentUser: any
-  role: 'admin' | 'user' | null
-  login: (email: string, password: string, role?: 'admin' | 'user') => Promise<void>
-  register: (email: string, password: string, name: string) => Promise<void>
-  logout: () => Promise<void>
-  loading: boolean
+  currentUser: User | null;
+  role: 'admin' | 'user' | 'superadmin' | null;
+  loading: boolean;
+  login: (email: string, password: string, loginRole?: 'admin' | 'user') => Promise<boolean>;
+  logout: () => void;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [role, setRole] = useState<'admin' | 'user' | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [role, setRole] = useState<'admin' | 'user' | 'superadmin' | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Example admin credentials (replace with secure backend check in production)
-  const ADMIN_EMAIL = 'admin@university.com';
-  const ADMIN_PASSWORD = 'admin123';
+  // Load user from localStorage on mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('currentUser');
+    const savedRole = localStorage.getItem('userRole');
+    if (savedUser && savedRole) {
+      try {
+        const user = JSON.parse(savedUser);
+        setCurrentUser(user);
+        setRole(savedRole as 'admin' | 'user' | 'superadmin');
+      } catch (error) {
+        console.error('Failed to parse saved user data:', error);
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('userRole');
+      }
+    }
+  }, []);
 
-  const login = async (email: string, password: string, loginRole: 'admin' | 'user' = 'user') => {
+  const login = async (email: string, password: string, loginRole: 'admin' | 'user' = 'user'): Promise<boolean> => {
     setLoading(true);
     try {
+      let response;
       if (loginRole === 'admin') {
-        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-          setRole('admin');
-          setCurrentUser({ email: ADMIN_EMAIL, name: 'Admin' });
-          toast.success('Admin logged in!');
-          return;
-        } else {
-          throw new Error('Invalid admin credentials');
-        }
+        response = await loginAdmin({ email, password });
       } else {
-        // Call backend login API
-        const res = await axiosInstance.post('/customer/login', { email, password });
-        setCurrentUser(res.data);
-        setRole('user');
-        toast.success('Successfully logged in!');
+        response = await loginCustomer({ email, password });
+      }
+
+      if (response && (response.success || response.id || response.email)) {
+        const userData: User = {
+          id: response.id?.toString() || response.userId?.toString() || email,
+          email: response.email || email,
+          name: response.name || `${response.firstName || ''} ${response.lastName || ''}`.trim() || 'User',
+          firstName: response.firstName,
+          lastName: response.lastName,
+          role: loginRole,
+        };
+
+        setCurrentUser(userData);
+        setRole(loginRole);
+
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+        localStorage.setItem('userRole', loginRole);
+
+        toast.success(`Welcome back, ${userData.name}!`);
+        return true;
+      } else {
+        throw new Error('Invalid response from server');
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to log in');
-      throw error;
+      console.error('Login error:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Login failed. Please check your credentials.';
+      toast.error(errorMessage);
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (email: string, password: string, name: string) => {
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
     setLoading(true);
     try {
-      await createCustomer({ email, password, name });
-      toast.success('Account created successfully!');
+      const [firstName, ...lastNameParts] = name.split(' ');
+      const lastName = lastNameParts.join(' ') || '';
+
+      const customerData = { firstName, lastName, email, password };
+
+      const response = await registerCustomer(customerData);
+
+      if (response && (response.success || response.id || response.email)) {
+        // Automatically log in newly registered user
+        await login(email, password, 'user'); // role is 'user' = Customer
+
+        toast.success(`Welcome, ${name}! Your account has been created.`);
+        return true;
+      } else {
+        throw new Error('Registration failed');
+      }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to create account');
-      throw error;
+      console.error('Registration error:', error);
+      const errorMessage = error?.message || 'Registration failed. Please try again.';
+      toast.error(errorMessage);
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = async () => {
+  const logout = () => {
     setCurrentUser(null);
     setRole(null);
-    toast.success('Successfully logged out!');
-  };
-
-  const value = {
-    currentUser,
-    role,
-    login,
-    register,
-    logout,
-    loading
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userRole');
+    toast.success('Logged out successfully');
   };
 
   return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
+      <AuthContext.Provider value={{ currentUser, role, loading, login, logout, register }}>
+        {children}
+      </AuthContext.Provider>
   );
 };

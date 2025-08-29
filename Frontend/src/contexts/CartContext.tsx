@@ -18,11 +18,11 @@ interface CartState {
 }
 
 type CartAction =
-  | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> }
-  | { type: 'REMOVE_ITEM'; payload: string }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
-  | { type: 'CLEAR_CART' }
-  | { type: 'LOAD_CART'; payload: CartItem[] }
+    | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> }
+    | { type: 'REMOVE_ITEM'; payload: string }
+    | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
+    | { type: 'CLEAR_CART' }
+    | { type: 'LOAD_CART'; payload: CartItem[] }
 
 interface CartContextType extends CartState {
   addItem: (item: Omit<CartItem, 'quantity'>) => void
@@ -44,21 +44,21 @@ export const useCart = () => {
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_ITEM': {
-      const existingItem = state.items.find(item => 
-        item.id === action.payload.id && 
-        item.size === action.payload.size && 
-        item.color === action.payload.color
+      const existingItem = state.items.find(item =>
+          item.id === action.payload.id &&
+          item.size === action.payload.size &&
+          item.color === action.payload.color
       )
 
       let newItems: CartItem[]
-      
+
       if (existingItem) {
         newItems = state.items.map(item =>
-          item.id === existingItem.id && 
-          item.size === existingItem.size && 
-          item.color === existingItem.color
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+            item.id === existingItem.id &&
+            item.size === existingItem.size &&
+            item.color === existingItem.color
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
         )
       } else {
         newItems = [...state.items, { ...action.payload, quantity: 1 }]
@@ -80,9 +80,9 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
     case 'UPDATE_QUANTITY': {
       const newItems = state.items.map(item =>
-        item.id === action.payload.id
-          ? { ...item, quantity: Math.max(0, action.payload.quantity) }
-          : item
+          item.id === action.payload.id
+              ? { ...item, quantity: Math.max(0, action.payload.quantity) }
+              : item
       ).filter(item => item.quantity > 0)
 
       const total = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
@@ -156,8 +156,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
+      <CartContext.Provider value={value}>
+        {children}
+      </CartContext.Provider>
   )
 }
