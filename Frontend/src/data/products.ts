@@ -92,7 +92,7 @@ export const products: Product[] = [
     category: 'furniture',
     inStock: true,
     colors: ['Black', 'Brown'],
-  
+
   },
 
   // Tents/Outdoor
@@ -106,7 +106,7 @@ export const products: Product[] = [
     inStock: true,
     features: ['Waterproof', 'UV Protection', 'Easy Setup', 'Carrying Bag Included']
   },
-  
+
 
   // Accessories
   {
@@ -149,7 +149,7 @@ export const products: Product[] = [
     category: 'accessories',
     inStock: true,
     colors: ['Black', 'Navy', 'Grey'],
-    },
+  },
   {
     id: '15',
     name: 'GreenBag',
@@ -170,7 +170,7 @@ export const products: Product[] = [
     category: 'accessories',
     inStock: true,
     colors: ['Black', 'Navy', 'Grey'],
-     },
+  },
   {
     id: '17',
     name: 'headphones',
@@ -180,7 +180,7 @@ export const products: Product[] = [
     category: 'accessories',
     inStock: true,
     colors: ['Black', 'Navy', 'Grey'],
-      },
+  },
   {
     id: '18',
     name: 'Lamp',
@@ -189,7 +189,7 @@ export const products: Product[] = [
     image: '/assets/images/lamp.png',
     category: 'accessories',
     inStock: true,
-     },
+  },
   {
     id: '19',
     name: 'Leather bag',
@@ -210,7 +210,7 @@ export const products: Product[] = [
     category: 'accessories',
     inStock: true,
     colors: ['Black', 'Navy', 'Grey'],
-      },
+  },
   {
     id: '21',
     name: 'speaker',
@@ -219,7 +219,7 @@ export const products: Product[] = [
     image: '/assets/images/Speaker render 1.png',
     category: 'accessories',
     inStock: true,
-     }
+  }
 
 
 ]
