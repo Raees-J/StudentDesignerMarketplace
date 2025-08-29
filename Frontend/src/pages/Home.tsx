@@ -35,7 +35,7 @@ const Home: React.FC = () => {
                 marginBottom: '2rem',
                 opacity: 0.9
               }}>
-                Official merchandise and supplies from the University Marketing Department. Quality products for students, staff, and alumni.
+                Official merchandise and supplies from the University Designer Department. Quality products for students, staff, and alumni.
               </p>
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 <Link to="/products" className="btn btn-primary" style={{
