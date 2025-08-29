@@ -37,14 +37,14 @@ const Header: React.FC = () => {
                 color: 'white',
                 fontWeight: 'bold'
               }}>
-                U
+                SDM
               </div>
               <div>
                 <h1 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>
-                  University Store
+                  Designer Market
                 </h1>
                 <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>
-                  Marketing Department
+                  Designer student Department
                 </p>
               </div>
             </div>

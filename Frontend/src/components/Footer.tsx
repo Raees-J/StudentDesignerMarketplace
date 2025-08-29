@@ -23,14 +23,14 @@ const Footer: React.FC = () => {
                   fontWeight: 'bold',
                   fontSize: '0.875rem'
                 }}>
-                  U
+                  SDM
                 </div>
                 <h3 style={{ fontSize: '1.125rem', fontWeight: '600', margin: 0 }}>
-                  University Store
+                  Designer Market
                 </h3>
               </div>
               <p style={{ color: '#9ca3af', fontSize: '0.875rem', lineHeight: '1.5', marginBottom: '1rem' }}>
-                Official merchandise and supplies from the University Marketing Department. 
+                Official merchandise and supplies from the University Design Department. 
                 Quality products for students, staff, and alumni.
               </p>
               <div style={{ display: 'flex', gap: '1rem' }}>
