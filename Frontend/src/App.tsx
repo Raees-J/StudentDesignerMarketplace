@@ -1,87 +1,116 @@
-
-
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import Footer from './components/Footer';
-import Header from './components/Header';
-import ProtectedAdminRoute from './components/ProtectedAdminRoute';
-import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminLogin from './pages/AdminLogin';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
+
+// Pages
+import Home from './pages/Home';
+import Products from './pages/Products';
+import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
-import Home from './pages/Home';
 import Login from './pages/Login';
-import ProductDetail from './pages/ProductDetail';
-import Products from './pages/Products';
-import Profile from './pages/Profile';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
+import AdminDashboard from './pages/AdminDashboard';
 import Contact from './pages/Contact';
 import About from './pages/About';
 
-function App() {
-  return (
-    <AuthProvider>
-      <CartProvider>
+const App: React.FC = () => {
+    return (
         <Router>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/products/:category" element={<Products />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/admin-login" element={<AdminLogin />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/about" element={<About />} />
-                <Route 
-                  path="/admin" 
-                  element={
-                    <ProtectedAdminRoute>
-                      <AdminDashboard />
-                    </ProtectedAdminRoute>
-                  }
-                />
-                <Route 
-                  path="/checkout" 
-                  element={
-                    <ProtectedRoute>
-                      <Checkout />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/profile" 
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  } 
-                />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
-            }}
-          />
-        </Router>
-      </CartProvider>
-    </AuthProvider>
-  )
-}
+            <AuthProvider>
+                <CartProvider>
+                    <div style={{
+                        minHeight: '100vh',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        backgroundColor: '#f9fafb'
+                    }}>
+                        <Toaster
+                            position="top-right"
+                            toastOptions={{
+                                duration: 4000,
+                                style: {
+                                    background: '#363636',
+                                    color: '#fff',
+                                },
+                                success: {
+                                    duration: 3000,
+                                    iconTheme: {
+                                        primary: '#4ade80',
+                                        secondary: '#fff',
+                                    },
+                                },
+                                error: {
+                                    duration: 4000,
+                                    iconTheme: {
+                                        primary: '#ef4444',
+                                        secondary: '#fff',
+                                    },
+                                },
+                            }}
+                        />
 
-export default App
+                        <Routes>
+                            {/* Admin Routes - No Header/Footer */}
+                            <Route
+                                path="/admin/dashboard"
+                                element={
+                                    <ProtectedAdminRoute>
+                                        <AdminDashboard />
+                                    </ProtectedAdminRoute>
+                                }
+                            />
+
+                            {/* Public Routes with Header/Footer */}
+                            <Route
+                                path="/*"
+                                element={
+                                    <>
+                                        <Header />
+                                        <main style={{ flex: 1 }}>
+                                            <Routes>
+                                                <Route path="/" element={<Home />} />
+                                                <Route path="/products" element={<Products />} />
+                                                <Route path="/products/:id" element={<ProductDetail />} />
+                                                <Route path="/cart" element={<Cart />} />
+                                                <Route path="/contact" element={<Contact />} />
+                                                <Route path="/about" element={<About />} />
+                                                <Route path="/login" element={<Login />} />
+                                                <Route path="/register" element={<Register />} />
+
+                                                {/* Protected Routes */}
+                                                <Route path="/checkout" element={
+                                                    <ProtectedRoute>
+                                                        <Checkout />
+                                                    </ProtectedRoute>
+                                                } />
+                                                <Route path="/profile" element={
+                                                    <ProtectedRoute>
+                                                        <Profile />
+                                                    </ProtectedRoute>
+                                                } />
+
+                                                {/* Catch all - redirect to home */}
+                                                <Route path="*" element={<Navigate to="/" replace />} />
+                                            </Routes>
+                                        </main>
+                                        <Footer />
+                                    </>
+                                }
+                            />
+                        </Routes>
+                    </div>
+                </CartProvider>
+            </AuthProvider>
+        </Router>
+    );
+};
+
+export default App;
