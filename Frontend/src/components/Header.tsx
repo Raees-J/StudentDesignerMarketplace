@@ -56,10 +56,10 @@ const Header: React.FC = () => {
                   justifyContent: 'center',
                   color: 'white',
                   fontWeight: '900',
-                  fontSize: '1.5rem',
+                  fontSize: '1rem',
                   boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
                 }}>
-                  U
+                  SDM
                 </div>
                 <div>
                   <h1 style={{
@@ -69,7 +69,7 @@ const Header: React.FC = () => {
                     margin: 0,
                     letterSpacing: '-0.025em'
                   }}>
-                    University Store
+                    Designer Market
                   </h1>
                   <p style={{
                     fontSize: '0.75rem',
@@ -77,7 +77,7 @@ const Header: React.FC = () => {
                     margin: 0,
                     fontWeight: '500'
                   }}>
-                    Marketing Department
+                    University Design Department
                   </p>
                 </div>
               </div>
@@ -122,8 +122,7 @@ const Header: React.FC = () => {
                         e.currentTarget.style.color = '#374151'
                         e.currentTarget.style.borderBottomColor = 'transparent'
                       }}>
-                  All Products
-                </Link>
+                  Products</Link>
                 <Link to="/contact" style={{
                   textDecoration: 'none',
                   color: '#374151',
@@ -141,8 +140,7 @@ const Header: React.FC = () => {
                         e.currentTarget.style.color = '#374151'
                         e.currentTarget.style.borderBottomColor = 'transparent'
                       }}>
-                  Contact Us
-                </Link>
+                        Contact</Link>
                 <Link to="/about" style={{
                   textDecoration: 'none',
                   color: '#374151',
@@ -160,7 +158,7 @@ const Header: React.FC = () => {
                         e.currentTarget.style.color = '#374151'
                         e.currentTarget.style.borderBottomColor = 'transparent'
                       }}>
-                  About Us
+                  About
                 </Link>
 
               </div>
@@ -474,21 +472,21 @@ const Header: React.FC = () => {
                       onClick={() => setIsMenuOpen(false)}
                       style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '600', padding: '0.5rem 0' }}
                   >
-                    All Products
+                    Products
                   </Link>
                   <Link
                       to="/contact"
                       onClick={() => setIsMenuOpen(false)}
                       style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '600', padding: '0.5rem 0' }}
                   >
-                    Contact Us
+                  Contact
                   </Link>
                   <Link
                       to="/about"
                       onClick={() => setIsMenuOpen(false)}
                       style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '600', padding: '0.5rem 0' }}
                   >
-                    About Us
+                  About
                   </Link>
                   <Link
                       to="/designer"
