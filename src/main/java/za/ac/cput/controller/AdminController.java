@@ -16,17 +16,15 @@ import za.ac.cput.service.AdminService;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/admins")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AdminController {
-
 
     private final AdminService adminService;
     private final AdminRepository adminRepository;
 
     @Autowired
-
     public AdminController(AdminService adminService, AdminRepository adminRepository) {
         this.adminService = adminService;
         this.adminRepository = adminRepository;
@@ -47,26 +45,45 @@ public class AdminController {
             }
 
             Admin saved = adminService.create(newAdmin);
-            return ResponseEntity.ok(saved);
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-
+    // DTO for secure login response
+    public record AdminLoginDTO(Long id, String firstName, String lastName, String email, String role) {}
 
     @PostMapping("/login")
-    public ResponseEntity<?> handleLogin(@RequestBody Admin loginInput) {
+    public ResponseEntity<?> login(@RequestBody Admin loginInput) {
         try {
-            Admin admin = adminRepository.findByEmail(loginInput.getEmail());
+            System.out.println("Login attempt: " + loginInput.getEmail());
 
-            if (admin == null || !admin.getPassword().equals(loginInput.getPassword())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Invalid email or password");
+            List<Admin> admins = adminRepository.findAllByEmail(loginInput.getEmail());
+
+            if (admins.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email not found");
             }
 
-            return ResponseEntity.ok(admin); // returns full Admin object (you can customize this)
+            Admin matched = admins.stream()
+                    .filter(a -> a.getPassword().equals(loginInput.getPassword()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (matched == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
+            }
+
+            AdminLoginDTO dto = new AdminLoginDTO(
+                    matched.getId(),
+                    matched.getFirstName(),
+                    matched.getLastName(),
+                    matched.getEmail(),
+                    matched.getRole()
+            );
+
+            return ResponseEntity.ok(dto);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -74,30 +91,36 @@ public class AdminController {
         }
     }
 
-
-
     @GetMapping("/all")
-    public List<Admin> getAll() {
-        return adminService.getAll();
+    public ResponseEntity<List<Admin>> getAll() {
+        List<Admin> admins = adminService.getAll();
+        return ResponseEntity.ok(admins);
     }
 
     @GetMapping("/read/{id}")
-    public Admin read(@PathVariable Long id) {
-        return adminService.read(id);
+    public ResponseEntity<Admin> read(@PathVariable Long id) {
+        Admin admin = adminService.read(id);
+        return admin != null
+                ? ResponseEntity.ok(admin)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @PostMapping("/update")
-    public Admin update(@RequestBody Admin admin) {
-        return adminService.update(admin);
+    public ResponseEntity<Admin> update(@RequestBody Admin admin) {
+        Admin updated = adminService.update(admin);
+        return updated != null
+                ? ResponseEntity.ok(updated)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @DeleteMapping("/delete/{id}")
-    public void delete(@PathVariable long id) {
+    public ResponseEntity<Void> delete(@PathVariable long id) {
         adminService.delete(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/ping")
-    public String ping() {
-        return "Admin backend is running!";
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("Admin backend is running!");
     }
 }
