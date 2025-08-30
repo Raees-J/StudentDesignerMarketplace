@@ -18,7 +18,7 @@ public class Customer extends User {
     private double amount;
 
     protected Customer() {
-        // Required by JPA
+        
     }
 
     public Customer(Builder builder) {
