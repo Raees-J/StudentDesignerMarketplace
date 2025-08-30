@@ -27,17 +27,17 @@ public class ReviewController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody Review reviewInput) {
+    public ResponseEntity<?> create(@RequestBody Review input) {
         try {
             Review newReview = ReviewFactory.buildReview(
-                    reviewInput.getProductID(),
-                    reviewInput.getCustomerID(),
-                    reviewInput.getRating(),
-                    reviewInput.getComment()
+                    input.getCustomerID(),
+                    input.getProductID(),
+                    input.getRating(),
+                    input.getComment()
             );
 
             if (newReview == null) {
-                return ResponseEntity.badRequest().body("Invalid input fields");
+                return ResponseEntity.badRequest().body("Invalid review input");
             }
 
             Review saved = reviewService.create(newReview);
@@ -51,26 +51,25 @@ public class ReviewController {
     @GetMapping("/read/{id}")
     public ResponseEntity<Review> read(@PathVariable String id) {
         Review review = reviewService.read(id);
-        if (review == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(review);
+        return (review != null) ?
+                ResponseEntity.ok(review) :
+                ResponseEntity.notFound().build();
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Review> update(@RequestBody Review review) {
+    public ResponseEntity<?> update(@RequestBody Review review) {
         Review updated = reviewService.update(review);
-        if (updated == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(null);
+        if (updated != null) {
+            return ResponseEntity.ok(updated);
         }
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Review with ID " + review.getReviewID() + " not found.");
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable String id) {
         reviewService.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Deleted review with ID: " + id);
     }
 
     @GetMapping("/all")
@@ -78,10 +77,28 @@ public class ReviewController {
         return reviewService.getAll();
     }
 
+    @GetMapping("/customer/{customerID}")
+    public List<Review> getByCustomer(@PathVariable String customerID) {
+        return reviewService.getReviewsByCustomerID(customerID);
+    }
+
+    @GetMapping("/product/{productID}")
+    public List<Review> getByProduct(@PathVariable String productID) {
+        return reviewService.getReviewsByProductID(productID);
+    }
+
+    @GetMapping("/rating/{rating}")
+    public List<Review> getByRating(@PathVariable int rating) {
+        return reviewService.getReviewsByRating(rating);
+    }
+
+    @GetMapping("/search")
+    public List<Review> searchByComment(@RequestParam String keyword) {
+        return reviewService.searchReviewsByComment(keyword);
+    }
+
     @GetMapping("/ping")
     public String ping() {
         return "Review backend is running!";
     }
 }
-
-

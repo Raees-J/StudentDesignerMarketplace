@@ -20,15 +20,7 @@ public class ReviewService implements IReviewService {
 
     @Override
     public Review create(Review review) {
-        Review newReview = new Review.Builder()
-                .setReviewID(review.getReviewID())
-                .setProductID(review.getProductID())
-                .setCustomerID(review.getCustomerID())
-                .setRating(review.getRating())
-                .setComment(review.getComment())
-                .build();
-
-        return repository.save(newReview);
+        return repository.save(review);
     }
 
     @Override
@@ -39,19 +31,9 @@ public class ReviewService implements IReviewService {
     @Override
     public Review update(Review review) {
         if (repository.existsById(review.getReviewID())) {
-            Review updatedReview = new Review.Builder()
-                    .setReviewID(review.getReviewID())
-                    .setProductID(review.getProductID())
-                    .setCustomerID(review.getCustomerID())
-                    .setRating(review.getRating())
-                    .setComment(review.getComment())
-                    .build();
-
-            return repository.save(updatedReview);
-        } else {
-            System.out.println("Review with ID " + review.getReviewID() + " does not exist.");
-            return null;
+            return repository.save(review);
         }
+        return null;
     }
 
     @Override
@@ -62,6 +44,22 @@ public class ReviewService implements IReviewService {
     @Override
     public List<Review> getAll() {
         return repository.findAll();
+    }
+
+    public List<Review> getReviewsByCustomerID(String customerID) {
+        return repository.findByCustomerID(customerID);
+    }
+
+    public List<Review> getReviewsByProductID(String productID) {
+        return repository.findByProductID(productID);
+    }
+
+    public List<Review> getReviewsByRating(int rating) {
+        return repository.findByRating(rating);
+    }
+
+    public List<Review> searchReviewsByComment(String keyword) {
+        return repository.findByCommentContainingIgnoreCase(keyword);
     }
 }
 
