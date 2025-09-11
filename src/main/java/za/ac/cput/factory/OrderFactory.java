@@ -6,8 +6,8 @@ import za.ac.cput.util.Helper;
 import java.util.UUID;
 
 public class OrderFactory {
-    public static Order buildOrder(String productID, String customerID, int quantity, double total){
-        if (Helper.isNullorEmpty(productID) || Helper.isNullorEmpty(customerID) || quantity <= 0 || total < 0){
+    public static Order buildOrder(String productID, String customerID, int quantity, double total) {
+        if (Helper.isNullOrEmpty(productID) || Helper.isNullOrEmpty(customerID) || quantity <= 0 || total < 0) {
             return null;
         }
 

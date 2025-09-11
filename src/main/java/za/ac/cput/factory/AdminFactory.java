@@ -12,8 +12,8 @@ public class AdminFactory {
     public static Admin buildAdmin(String firstName, String lastName,
                                    String email, String password) {
 
-        if (Helper.isNullorEmpty(firstName) || Helper.isNullorEmpty(lastName) ||
-                Helper.isNullorEmpty(email) || Helper.isNullorEmpty(password) ) {
+        if (Helper.isNullOrEmpty(firstName) || Helper.isNullOrEmpty(lastName) ||
+                Helper.isNullOrEmpty(email) || Helper.isNullOrEmpty(password)) {
             return null;
         }
 
