@@ -2,6 +2,7 @@ package za.ac.cput.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import java.util.Objects;
 
 /**
@@ -14,6 +15,8 @@ public class Product {
     private String name;
     private String description;
     private double price;
+    @Lob
+    private String imageUrl;
 
     protected Product(){}
 
@@ -22,12 +25,14 @@ public class Product {
         this.name = builder.name;
         this.description = builder.description;
         this.price = builder.price;
+        this.imageUrl = builder.imageUrl;
     }
 
     public String getProductID(){return productID;}
     public String getName(){return name;}
     public String getDescription(){return description;}
     public double getPrice(){return price;}
+    public String getImageUrl(){return imageUrl;}
 
     @Override
     public boolean equals(Object o){
@@ -37,12 +42,13 @@ public class Product {
         return Double.compare(product.price, price)==0 &&
                 Objects.equals(productID, product.productID) &&
                 Objects.equals(name, product.name) &&
-                Objects.equals(description, product.description);
+                Objects.equals(description, product.description) &&
+                Objects.equals(imageUrl, product.imageUrl);
     }
 
     @Override
     public int hashCode(){
-        return Objects.hash(productID, name, description, price);
+        return Objects.hash(productID, name, description, price, imageUrl);
     }
 
     @Override
@@ -52,6 +58,7 @@ public class Product {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
+                ", imageUrl='" + imageUrl + '\'' +
                 '}';
     }
 
@@ -60,17 +67,20 @@ public class Product {
         private String name;
         private String description;
         private double price;
+        private String imageUrl;
 
         public Builder setProductID(String productID){this.productID=productID;return this;}
         public Builder setName(String name){this.name=name;return this;}
         public Builder setDescription(String description){this.description=description;return this;}
         public Builder setPrice(double price){this.price=price;return this;}
+        public Builder setImageUrl(String imageUrl){this.imageUrl=imageUrl;return this;}
 
         public Builder copy(Product product){
             this.productID=product.productID;
             this.name=product.name;
             this.description=product.description;
             this.price=product.price;
+            this.imageUrl=product.imageUrl;
             return this;
         }
 

@@ -6,8 +6,8 @@ import za.ac.cput.util.Helper;
 import java.util.UUID;
 
 public class ProductFactory {
-    public static Product buildProduct(String name, String description, double price) {
-        if (Helper.isNullOrEmpty(name) || Helper.isNullOrEmpty(description) || price <= 0) {
+    public static Product buildProduct(String name, String description, double price, String imageUrl) {
+        if (Helper.isNullOrEmpty(name) || Helper.isNullOrEmpty(description) || price <= 0 || Helper.isNullOrEmpty(imageUrl)) {
             return null;
         }
 
@@ -18,6 +18,7 @@ public class ProductFactory {
                 .setName(name)
                 .setDescription(description)
                 .setPrice(price)
+                .setImageUrl(imageUrl)
                 .build();
     }
 }

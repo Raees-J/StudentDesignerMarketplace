@@ -24,6 +24,7 @@ public class ProductService implements IProductService {
                 .setName(product.getName())
                 .setDescription(product.getDescription())
                 .setPrice(product.getPrice())
+                .setImageUrl(product.getImageUrl())
                 .build();
         return repository.save(newProduct);
     }
@@ -41,6 +42,7 @@ public class ProductService implements IProductService {
                     .setName(product.getName())
                     .setDescription(product.getDescription())
                     .setPrice(product.getPrice())
+                    .setImageUrl(product.getImageUrl())
                     .build();
             return repository.save(updated);
         }
