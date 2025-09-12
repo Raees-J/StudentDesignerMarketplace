@@ -122,8 +122,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         toast.success(`Welcome, ${name}! Your account has been created.`);
         return true;
-        throw new Error('Registration failed');
       }
+
+      throw new Error('Registration failed');
     } catch (error: any) {
       console.error('Registration error:', error);
       const errorMessage = error?.message || 'Registration failed. Please try again.';
