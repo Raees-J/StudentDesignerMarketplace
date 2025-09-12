@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User, Shield } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,6 +14,7 @@ const Register: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [role, setRole] = useState<'admin' | 'user'>('user');
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -53,10 +54,13 @@ const Register: React.FC = () => {
 
     try {
       // Register and auto-login as 'user' (Customer)
-      const success = await register(formData.name, formData.email, formData.password);
+      const success = await register(formData.name, formData.email, formData.password, role);
       if (success) {
-        // Auto-login handled inside AuthContext.register
-        navigate('/'); // Redirect to homepage or dashboard
+        if (role === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/');
+        }
       }
     } catch (error) {
       // Error is already handled in AuthContext
@@ -70,8 +74,65 @@ const Register: React.FC = () => {
         <div className="container" style={{ maxWidth: '400px' }}>
           <div className="card" style={{ padding: '2rem' }}>
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937', marginBottom: '0.5rem' }}>Create Account</h1>
-              <p style={{ color: '#6b7280' }}>Join us to start shopping for university merchandise</p>
+              <div style={{ marginBottom: '1rem' }}>
+                {role === 'admin' ? (
+                    <Shield size={48} style={{ color: '#3b82f6', margin: '0 auto' }} />
+                ) : (
+                    <User size={48} style={{ color: '#3b82f6', margin: '0 auto' }} />
+                )}
+              </div>
+              <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937', marginBottom: '0.5rem' }}>
+                {role === 'admin' ? 'Admin Registration' : 'Create Account'}
+              </h1>
+              <p style={{ color: '#6b7280' }}>
+                {role === 'admin'
+                    ? 'Register to manage the University Store'
+                    : 'Join us to start shopping for university merchandise'}
+              </p>
+            </div>
+
+            {/* Role Toggle */}
+            <div style={{
+              display: 'flex',
+              backgroundColor: '#f3f4f6',
+              borderRadius: '0.5rem',
+              padding: '0.25rem',
+              marginBottom: '1.5rem'
+            }}>
+              <button
+                  type="button"
+                  onClick={() => setRole('user')}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem',
+                    backgroundColor: role === 'user' ? '#3b82f6' : 'transparent',
+                    color: role === 'user' ? 'white' : '#6b7280',
+                    border: 'none',
+                    borderRadius: '0.375rem',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    transition: 'all 0.2s'
+                  }}
+              >
+                Customer
+              </button>
+              <button
+                  type="button"
+                  onClick={() => setRole('admin')}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem',
+                    backgroundColor: role === 'admin' ? '#3b82f6' : 'transparent',
+                    color: role === 'admin' ? 'white' : '#6b7280',
+                    border: 'none',
+                    borderRadius: '0.375rem',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    transition: 'all 0.2s'
+                  }}
+              >
+                Admin
+              </button>
             </div>
 
             <form onSubmit={handleSubmit} style={{ marginBottom: '1.5rem' }}>
@@ -176,7 +237,7 @@ const Register: React.FC = () => {
             <div style={{ textAlign: 'center' }}>
               <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
                 Already have an account?{' '}
-                <Link to="/login" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '500' }}>
+                <Link to={`/login?role=${role}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '500' }}>
                   Sign in here
                 </Link>
               </p>

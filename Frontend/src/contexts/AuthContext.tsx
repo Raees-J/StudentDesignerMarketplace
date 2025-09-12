@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { loginAdmin, loginCustomer, registerCustomer } from '../api/profileApi';
+import { loginAdmin, loginCustomer, registerCustomer, registerAdmin } from '../api/profileApi';
 
 export interface User {
   id: string;
@@ -17,7 +17,12 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string, loginRole?: 'admin' | 'user') => Promise<boolean>;
   logout: () => void;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  register: (
+      name: string,
+      email: string,
+      password: string,
+      role?: 'admin' | 'user'
+  ) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -91,23 +96,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (
+      name: string,
+      email: string,
+      password: string,
+      role: 'admin' | 'user' = 'user'
+  ): Promise<boolean> => {
     setLoading(true);
     try {
       const [firstName, ...lastNameParts] = name.split(' ');
       const lastName = lastNameParts.join(' ') || '';
 
-      const customerData = { firstName, lastName, email, password };
-
-      const response = await registerCustomer(customerData);
+      let response;
+      if (role === 'admin') {
+        const adminData = { firstName, lastName, email, password };
+        response = await registerAdmin(adminData);
+      } else {
+        const customerData = { firstName, lastName, email, password };
+        response = await registerCustomer(customerData);
+      };
 
       if (response && (response.success || response.id || response.email)) {
         // Automatically log in newly registered user
-        await login(email, password, 'user'); // role is 'user' = Customer
+        await login(email, password, role);
 
         toast.success(`Welcome, ${name}! Your account has been created.`);
         return true;
-      } else {
         throw new Error('Registration failed');
       }
     } catch (error: any) {
