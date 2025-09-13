@@ -668,7 +668,7 @@ const AdminDashboard: React.FC = () => {
         );
     };
 
-    const renderProductForm = () => {
+    const ProductForm: React.FC = () => {
         const [formData, setFormData] = useState(selectedItem || {
             name: '',
             description: '',
@@ -781,7 +781,7 @@ const AdminDashboard: React.FC = () => {
         );
     };
 
-    const renderDesignerForm = () => {
+    const DesignerForm: React.FC = () => {
         const [formData, setFormData] = useState(selectedItem || {
             name: '',
             title: '',
@@ -1049,7 +1049,7 @@ const AdminDashboard: React.FC = () => {
         );
     };
 
-    const renderAdminForm = () => {
+    const AdminForm: React.FC = () => {
         const [formData, setFormData] = useState(selectedItem || {
             firstName: '',
             lastName: '',
@@ -1390,13 +1390,13 @@ const AdminDashboard: React.FC = () => {
                 return renderCustomerDetails();
             }
             if (activeTab === 'products' && (viewMode === 'create' || viewMode === 'edit')) {
-                return renderProductForm();
+                return <ProductForm />;
             }
             if (activeTab === 'designers' && (viewMode === 'create' || viewMode === 'edit')) {
-                return renderDesignerForm();
+                return <DesignerForm />;
             }
             if (activeTab === 'admins' && viewMode === 'create') {
-                return renderAdminForm();
+                return <AdminForm />;
             }
         }
 
