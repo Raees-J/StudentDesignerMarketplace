@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       response = await loginAdmin({ email, password });
       detectedRole = 'admin';
     } catch {
-      // If admin login fails, try customer login
+      
       response = await loginCustomer({ email, password });
       detectedRole = 'user';
     }

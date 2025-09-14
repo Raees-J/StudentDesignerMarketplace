@@ -8,8 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProductFactoryTest {
     @Test
     void buildProduct(){
-        Product product = ProductFactory.buildProduct("Logo Design", "Professional logo", 150.0);
+        Product product = ProductFactory.buildProduct("Logo Design", "Professional logo", 150.0, "img");
         assertNotNull(product);
         assertEquals("Logo Design", product.getName());
+        assertEquals("img", product.getImageUrl());
     }
 }

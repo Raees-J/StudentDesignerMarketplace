@@ -1,10 +1,16 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Star, Shield, Truck, HeadphonesIcon } from 'lucide-react'
 import ProductCard from '../components/ProductCard'
-import { products, categories } from '../data/products'
+import { categories, Product } from '../data/products'
+import { getAllProducts } from '../api/productService'
 
 const Home: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    getAllProducts().then(setProducts).catch(console.error)
+  }, [])
   const featuredProducts = products.slice(0, 8)
 
   return (

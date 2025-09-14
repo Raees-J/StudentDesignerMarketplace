@@ -30,7 +30,8 @@ public class ProductController {
         Product newProduct = ProductFactory.buildProduct(
                 productInput.getName(),
                 productInput.getDescription(),
-                productInput.getPrice()
+                productInput.getPrice(),
+                productInput.getImageUrl()
         );
         if(newProduct == null){
             return ResponseEntity.badRequest().body("Invalid input fields");

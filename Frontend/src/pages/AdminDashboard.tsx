@@ -19,6 +19,8 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { getAllProducts, createProduct, updateProduct } from '../api/productService';
+import { Product } from '../data/products';
 
 interface DashboardStats {
     totalCustomers: number;
@@ -37,16 +39,6 @@ interface Customer {
     city?: string;
     province?: string;
     postalCode?: string;
-}
-
-interface Product {
-    id: string;
-    name: string;
-    price: number;
-    category: string;
-    stock: number;
-    description?: string;
-    image?: string;
 }
 
 interface Designer {
@@ -144,36 +136,9 @@ const AdminDashboard: React.FC = () => {
                     postalCode: '4000'
                 }
             ]);
-
-            setProducts([
-                {
-                    id: '1',
-                    name: 'University T-Shirt',
-                    price: 259.99,
-                    category: 'Apparel',
-                    stock: 45,
-                    description: 'High-quality cotton t-shirt with university logo',
-                    image: 'https://images.pexels.com/photos/5866728/pexels-photo-5866728.jpeg'
-                },
-                {
-                    id: '2',
-                    name: 'Study Desk',
-                    price: 1999.99,
-                    category: 'Furniture',
-                    stock: 12,
-                    description: 'Ergonomic study desk perfect for students',
-                    image: 'https://images.pexels.com/photos/6782567/pexels-photo-6782567.jpeg'
-                },
-                {
-                    id: '3',
-                    name: 'University Mug',
-                    price: 129.99,
-                    category: 'Promotional',
-                    stock: 78,
-                    description: 'Ceramic mug with university branding',
-                    image: 'https://images.pexels.com/photos/6195121/pexels-photo-6195121.jpeg'
-                }
-            ]);
+            const fetchedProducts = await getAllProducts();
+            setProducts(fetchedProducts);
+            setStats(prev => ({ ...prev, totalProducts: fetchedProducts.length }));
 
             setDesigners([
                 {
@@ -703,7 +668,120 @@ const AdminDashboard: React.FC = () => {
         );
     };
 
-    const renderDesignerForm = () => {
+    const ProductForm: React.FC = () => {
+        const [formData, setFormData] = useState(selectedItem || {
+            name: '',
+            description: '',
+            price: 0,
+            image: ''
+        });
+
+        const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const file = e.target.files?.[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    setFormData({ ...formData, image: ev.target?.result as string });
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        const handleSubmit = async (e: React.FormEvent) => {
+            e.preventDefault();
+            try {
+                if (viewMode === 'create') {
+                    const created = await createProduct(formData);
+                    setProducts([...products, created]);
+                    toast.success('Product created successfully!');
+                } else {
+                    const updated = await updateProduct({ ...formData, id: selectedItem.id });
+                    setProducts(products.map(p => p.id === updated.id ? updated : p));
+                    toast.success('Product updated successfully!');
+                }
+                setViewMode('list');
+            } catch (err) {
+                toast.error('Failed to save product');
+            }
+        };
+
+        return (
+            <div style={{
+                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                padding: '2rem',
+                borderRadius: '1rem',
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+            }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '2rem', color: '#1e293b' }}>
+                    {viewMode === 'create' ? 'Add New Product' : 'Edit Product'}
+                </h3>
+                <form onSubmit={handleSubmit}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                        <div>
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                    Image
+                                </label>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    {formData.image && (
+                                        <img src={formData.image} alt="Preview" style={{ width: '4rem', height: '4rem', objectFit: 'cover', borderRadius: '0.5rem' }} />
+                                    )}
+                                    <label style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        padding: '0.75rem 1rem',
+                                        backgroundColor: '#3b82f6',
+                                        color: 'white',
+                                        borderRadius: '0.5rem',
+                                        cursor: 'pointer',
+                                        fontWeight: '500'
+                                    }}>
+                                        <Upload size={16} />
+                                        Upload Image
+                                        <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+                                    </label>
+                                </div>
+                            </div>
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                    Name
+                                </label>
+                                <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem', fontSize: '1rem' }} required />
+                            </div>
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                    Price
+                                </label>
+                                <input type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })} style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem', fontSize: '1rem' }} required />
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                    Description
+                                </label>
+                                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={6} style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem', fontSize: '1rem', resize: 'vertical' }} required />
+                            </div>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                        <button type="button" onClick={handleBackToList} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '0.5rem', fontWeight: '600', cursor: 'pointer' }}>
+                            <X size={16} />
+                            Cancel
+                        </button>
+                        <button type="submit" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '0.5rem', fontWeight: '600', cursor: 'pointer' }}>
+                            <Save size={16} />
+                            {viewMode === 'create' ? 'Create Product' : 'Save Changes'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        );
+    };
+
+    const DesignerForm: React.FC = () => {
         const [formData, setFormData] = useState(selectedItem || {
             name: '',
             title: '',
@@ -971,7 +1049,7 @@ const AdminDashboard: React.FC = () => {
         );
     };
 
-    const renderAdminForm = () => {
+    const AdminForm: React.FC = () => {
         const [formData, setFormData] = useState(selectedItem || {
             firstName: '',
             lastName: '',
@@ -1311,11 +1389,14 @@ const AdminDashboard: React.FC = () => {
             if (activeTab === 'customers' && viewMode === 'view') {
                 return renderCustomerDetails();
             }
+            if (activeTab === 'products' && (viewMode === 'create' || viewMode === 'edit')) {
+                return <ProductForm />;
+            }
             if (activeTab === 'designers' && (viewMode === 'create' || viewMode === 'edit')) {
-                return renderDesignerForm();
+                return <DesignerForm />;
             }
             if (activeTab === 'admins' && viewMode === 'create') {
-                return renderAdminForm();
+                return <AdminForm />;
             }
         }
 
@@ -1325,7 +1406,7 @@ const AdminDashboard: React.FC = () => {
             case 'customers':
                 return renderDataTable(customers, ['First Name', 'Last Name', 'Email', 'Payment Method']);
             case 'products':
-                return renderDataTable(products, ['Name', 'Category', 'Price', 'Stock']);
+                return renderDataTable(products, ['Name', 'Price']);
             case 'designers':
                 return renderDataTable(designers, ['Name', 'Title', 'Email', 'Portfolio']);
             case 'admins':
