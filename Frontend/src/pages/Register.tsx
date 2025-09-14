@@ -1,250 +1,272 @@
-import { Eye, EyeOff, Lock, Mail, User, Shield } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    confirmPassword: ''
+    password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [role, setRole] = useState<'admin' | 'user'>('user');
-
-  const { register } = useAuth();
+  const { register, loading } = useAuth();
   const navigate = useNavigate();
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-
-    if (!formData.password) newErrors.password = 'Password is required';
-    else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
-
-    if (!formData.confirmPassword) newErrors.confirmPassword = 'Please confirm your password';
-    else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    if (!formData.name) newErrors.name = 'Full name is required';
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
-    setLoading(true);
-
     try {
-      // Register and auto-login as 'user' (Customer)
-      const success = await register(formData.name, formData.email, formData.password, role);
+      const success = await register(formData.name, formData.email, formData.password);
       if (success) {
-        if (role === 'admin') {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/');
-        }
+        navigate('/'); // redirect after registration
       }
     } catch (error) {
-      // Error is already handled in AuthContext
-    } finally {
-      setLoading(false);
+      toast.error('Registration failed. Please try again.');
     }
   };
 
   return (
-      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 0' }}>
-        <div className="container" style={{ maxWidth: '400px' }}>
-          <div className="card" style={{ padding: '2rem' }}>
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <div style={{ marginBottom: '1rem' }}>
-                {role === 'admin' ? (
-                    <Shield size={48} style={{ color: '#3b82f6', margin: '0 auto' }} />
-                ) : (
-                    <User size={48} style={{ color: '#3b82f6', margin: '0 auto' }} />
-                )}
-              </div>
-              <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937', marginBottom: '0.5rem' }}>
-                {role === 'admin' ? 'Admin Registration' : 'Create Account'}
-              </h1>
-              <p style={{ color: '#6b7280' }}>
-                {role === 'admin'
-                    ? 'Register to manage the University Store'
-                    : 'Join us to start shopping for university merchandise'}
-              </p>
-            </div>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '1rem',
+      background: 'linear-gradient(to right, #eff6ff, #f9fafb)',
+      boxSizing: 'border-box'
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '1rem',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
+        padding: '2.5rem',
+        width: '100%',
+        maxWidth: '420px'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{
+            fontSize: '1.75rem',
+            fontWeight: 700,
+            color: '#111827',
+            marginBottom: '0.5rem'
+          }}>
+            Create Account
+          </h1>
+          <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
+            Fill in your details to sign up
+          </p>
+        </div>
 
-            {/* Role Toggle */}
-            <div style={{
-              display: 'flex',
-              backgroundColor: '#f3f4f6',
-              borderRadius: '0.5rem',
-              padding: '0.25rem',
-              marginBottom: '1.5rem'
+        <form onSubmit={handleSubmit} style={{ marginBottom: '1.5rem' }}>
+          {/* Full Name */}
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.4rem',
+              fontWeight: 600,
+              color: '#374151'
             }}>
-              <button
-                  type="button"
-                  onClick={() => setRole('user')}
-                  style={{
-                    flex: 1,
-                    padding: '0.5rem',
-                    backgroundColor: role === 'user' ? '#3b82f6' : 'transparent',
-                    color: role === 'user' ? 'white' : '#6b7280',
-                    border: 'none',
-                    borderRadius: '0.375rem',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    transition: 'all 0.2s'
-                  }}
-              >
-                Customer
-              </button>
-              <button
-                  type="button"
-                  onClick={() => setRole('admin')}
-                  style={{
-                    flex: 1,
-                    padding: '0.5rem',
-                    backgroundColor: role === 'admin' ? '#3b82f6' : 'transparent',
-                    color: role === 'admin' ? 'white' : '#6b7280',
-                    border: 'none',
-                    borderRadius: '0.375rem',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    transition: 'all 0.2s'
-                  }}
-              >
-                Admin
-              </button>
+              Full Name
+            </label>
+            <div style={{ position: 'relative' }}>
+              <User size={18} style={{
+                position: 'absolute',
+                left: '0.9rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#9ca3af'
+              }} />
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Enter your full name"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 0.75rem 0.75rem 2.5rem',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${errors.name ? '#ef4444' : '#d1d5db'}`,
+                  outline: 'none',
+                  fontSize: '0.95rem'
+                }}
+              />
             </div>
-
-            <form onSubmit={handleSubmit} style={{ marginBottom: '1.5rem' }}>
-              {/* Full Name */}
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Full Name</label>
-                <div style={{ position: 'relative' }}>
-                  <User size={20} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-                  <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="input"
-                      style={{ paddingLeft: '2.5rem', borderColor: errors.name ? '#ef4444' : undefined }}
-                      placeholder="Enter your full name"
-                  />
-                </div>
-                {errors.name && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem' }}>{errors.name}</p>}
-              </div>
-
-              {/* Email */}
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Email Address</label>
-                <div style={{ position: 'relative' }}>
-                  <Mail size={20} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-                  <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="input"
-                      style={{ paddingLeft: '2.5rem', borderColor: errors.email ? '#ef4444' : undefined }}
-                      placeholder="Enter your email"
-                  />
-                </div>
-                {errors.email && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem' }}>{errors.email}</p>}
-              </div>
-
-              {/* Password */}
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Password</label>
-                <div style={{ position: 'relative' }}>
-                  <Lock size={20} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-                  <input
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      className="input"
-                      style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem', borderColor: errors.password ? '#ef4444' : undefined }}
-                      placeholder="Create a password"
-                  />
-                  <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer' }}
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-                {errors.password && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem' }}>{errors.password}</p>}
-              </div>
-
-              {/* Confirm Password */}
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Confirm Password</label>
-                <div style={{ position: 'relative' }}>
-                  <Lock size={20} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-                  <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      className="input"
-                      style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem', borderColor: errors.confirmPassword ? '#ef4444' : undefined }}
-                      placeholder="Confirm your password"
-                  />
-                  <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer' }}
-                  >
-                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-                {errors.confirmPassword && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem' }}>{errors.confirmPassword}</p>}
-              </div>
-
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.75rem' }} disabled={loading}>
-                {loading ? 'Creating Account...' : 'Create Account'}
-              </button>
-            </form>
-
-            <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
-              <hr />
-              <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', padding: '0 1rem', color: '#6b7280', fontSize: '0.875rem' }}>
-              or
-            </span>
-            </div>
-
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                Already have an account?{' '}
-                <Link to={`/login?role=${role}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '500' }}>
-                  Sign in here
-                </Link>
+            {errors.name && (
+              <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                {errors.name}
               </p>
-            </div>
+            )}
           </div>
+
+          {/* Email */}
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.4rem',
+              fontWeight: 600,
+              color: '#374151'
+            }}>
+              Email Address
+            </label>
+            <div style={{ position: 'relative' }}>
+              <Mail size={18} style={{
+                position: 'absolute',
+                left: '0.9rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#9ca3af'
+              }} />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Enter your email"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 0.75rem 0.75rem 2.5rem',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${errors.email ? '#ef4444' : '#d1d5db'}`,
+                  outline: 'none',
+                  fontSize: '0.95rem'
+                }}
+              />
+            </div>
+            {errors.email && (
+              <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                {errors.email}
+              </p>
+            )}
+          </div>
+
+          {/* Password */}
+          <div style={{ marginBottom: '1.75rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.4rem',
+              fontWeight: 600,
+              color: '#374151'
+            }}>
+              Password
+            </label>
+            <div style={{ position: 'relative' }}>
+              <Lock size={18} style={{
+                position: 'absolute',
+                left: '0.9rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#9ca3af'
+              }} />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your password"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 2.5rem 0.75rem 2.5rem',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${errors.password ? '#ef4444' : '#d1d5db'}`,
+                  outline: 'none',
+                  fontSize: '0.95rem'
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '0.9rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#9ca3af'
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            {errors.password && (
+              <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                {errors.password}
+              </p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '0.8rem',
+              borderRadius: '0.5rem',
+              border: 'none',
+              background: loading ? '#93c5fd' : '#2563eb',
+              color: 'white',
+              fontWeight: 600,
+              fontSize: '1rem',
+              cursor: loading ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {loading ? 'Creating account...' : 'Sign Up'}
+          </button>
+        </form>
+
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              style={{
+                color: '#2563eb',
+                textDecoration: 'none',
+                fontWeight: 600
+              }}
+            >
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
+    </div>
   );
 };
 
