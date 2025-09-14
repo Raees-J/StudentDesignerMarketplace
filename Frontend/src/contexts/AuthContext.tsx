@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [role, setRole] = useState<'admin' | 'user' | 'superadmin' | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Load user from localStorage on mount
+  
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
     const savedRole = localStorage.getItem('userRole');
@@ -50,46 +50,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (email: string, password: string, loginRole: 'admin' | 'user' = 'user'): Promise<boolean> => {
-    setLoading(true);
+  const login = async (email: string, password: string): Promise<boolean> => {
+  setLoading(true);
+  try {
+    let response;
+    let detectedRole: 'admin' | 'user' | 'superadmin' = 'user';
+
+    // Try logging in as admin first
     try {
-      let response;
-      if (loginRole === 'admin') {
-        response = await loginAdmin({ email, password });
-      } else {
-        response = await loginCustomer({ email, password });
-      }
-
-      if (response && (response.success || response.id || response.email)) {
-        const userData: User = {
-          id: response.id?.toString() || response.userId?.toString() || email,
-          email: response.email || email,
-          name: response.name || `${response.firstName || ''} ${response.lastName || ''}`.trim() || 'User',
-          firstName: response.firstName,
-          lastName: response.lastName,
-          role: loginRole,
-        };
-
-        setCurrentUser(userData);
-        setRole(loginRole);
-
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        localStorage.setItem('userRole', loginRole);
-
-        toast.success(`Welcome back, ${userData.name}!`);
-        return true;
-      } else {
-        throw new Error('Invalid response from server');
-      }
-    } catch (error: any) {
-      console.error('Login error:', error);
-      const errorMessage = error?.response?.data?.message || error?.message || 'Login failed. Please check your credentials.';
-      toast.error(errorMessage);
-      return false;
-    } finally {
-      setLoading(false);
+      response = await loginAdmin({ email, password });
+      detectedRole = 'admin';
+    } catch {
+      // If admin login fails, try customer login
+      response = await loginCustomer({ email, password });
+      detectedRole = 'user';
     }
-  };
+
+    if (response && (response.success || response.id || response.email)) {
+      const userData: User = {
+        id: response.id?.toString() || response.userId?.toString() || email,
+        email: response.email || email,
+        name:
+          response.name ||
+          `${response.firstName || ''} ${response.lastName || ''}`.trim() ||
+          'User',
+        firstName: response.firstName,
+        lastName: response.lastName,
+        role: detectedRole,
+      };
+
+      setCurrentUser(userData);
+      setRole(detectedRole);
+
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+      localStorage.setItem('userRole', detectedRole);
+
+      toast.success(`Welcome back, ${userData.name}!`);
+      return true;
+    } else {
+      throw new Error('Invalid response from server');
+    }
+  } catch (error: any) {
+    console.error('Login error:', error);
+    const errorMessage =
+      error?.response?.data?.message ||
+      error?.message ||
+      'Login failed. Please check your credentials.';
+    toast.error(errorMessage);
+    return false;
+  } finally {
+    setLoading(false);
+  }
+};
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     setLoading(true);
@@ -102,8 +114,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await registerCustomer(customerData);
 
       if (response && (response.success || response.id || response.email)) {
-        // Automatically log in newly registered user
-        await login(email, password, 'user'); // role is 'user' = Customer
+        
+        await login(email, password); // Auto-login after successful registration
 
         toast.success(`Welcome, ${name}! Your account has been created.`);
         return true;
