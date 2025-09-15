@@ -19,7 +19,8 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getAllProducts, createProduct, updateProduct } from '../api/productService';
+import { getAllProducts, createProduct, updateProduct, deleteProduct } from '../api/productService';
+import { getAllAdmins, registerAdmin, updateAdmin, deleteAdmin, Admin } from '../api/adminService';
 import { Product } from '../data/products';
 
 interface DashboardStats {
@@ -51,15 +52,6 @@ interface Designer {
     productsDesigned: string[];
     email: string;
     portfolio: string;
-}
-
-interface Admin {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: string;
-    createdAt: string;
 }
 
 const AdminDashboard: React.FC = () => {
@@ -154,16 +146,8 @@ const AdminDashboard: React.FC = () => {
                 }
             ]);
 
-            setAdmins([
-                {
-                    id: '1',
-                    firstName: 'Super',
-                    lastName: 'Admin',
-                    email: 'admin@university.edu',
-                    role: 'Super Admin',
-                    createdAt: '2025-08-08'
-                }
-            ]);
+            const fetchedAdmins = await getAllAdmins();
+            setAdmins(fetchedAdmins);
 
         } catch (error) {
             console.error('Error loading dashboard data:', error);
@@ -200,6 +184,21 @@ const AdminDashboard: React.FC = () => {
     const handleCreate = () => {
         setSelectedItem(null);
         setViewMode('create');
+    };
+
+    const handleDelete = async (tab: string, item: any) => {
+        try {
+            if (tab === 'products') {
+                await deleteProduct(item.id);
+                setProducts(products.filter(p => p.id !== item.id));
+            } else if (tab === 'admins') {
+                await deleteAdmin(item.id);
+                setAdmins(admins.filter(a => a.id !== item.id));
+            }
+            toast.success('Deleted successfully!');
+        } catch (error) {
+            toast.error('Failed to delete');
+        }
     };
 
     const formatCurrency = (amount: number) => {
@@ -662,7 +661,114 @@ const AdminDashboard: React.FC = () => {
                             </p>
                         </div>
                     </div>
+                </div>
+            </div>
+        );
+    };
 
+    const renderProductDetails = () => {
+        if (!selectedItem) return null;
+
+        return (
+            <div style={{
+                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                padding: '2rem',
+                borderRadius: '1rem',
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+            }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '2rem', color: '#1e293b' }}>
+                    Product Details
+                </h3>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                    <div>
+                        <img src={selectedItem.image} alt={selectedItem.name} style={{ width: '200px', height: '200px', objectFit: 'cover', borderRadius: '0.5rem', marginBottom: '1rem' }} />
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                Name
+                            </label>
+                            <p style={{ fontSize: '1.125rem', color: '#1e293b', padding: '0.75rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                                {selectedItem.name}
+                            </p>
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                Description
+                            </label>
+                            <p style={{ fontSize: '1.125rem', color: '#1e293b', padding: '0.75rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                                {selectedItem.description}
+                            </p>
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                Price
+                            </label>
+                            <p style={{ fontSize: '1.125rem', color: '#1e293b', padding: '0.75rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                                {formatCurrency(selectedItem.price)}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const renderAdminDetails = () => {
+        if (!selectedItem) return null;
+
+        return (
+            <div style={{
+                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                padding: '2rem',
+                borderRadius: '1rem',
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+            }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '2rem', color: '#1e293b' }}>
+                    Admin Details
+                </h3>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                    <div>
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                Full Name
+                            </label>
+                            <p style={{ fontSize: '1.125rem', color: '#1e293b', padding: '0.75rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                                {selectedItem.firstName} {selectedItem.lastName}
+                            </p>
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                Email
+                            </label>
+                            <p style={{ fontSize: '1.125rem', color: '#1e293b', padding: '0.75rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                                {selectedItem.email}
+                            </p>
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                Role
+                            </label>
+                            <p style={{ fontSize: '1.125rem', color: '#1e293b', padding: '0.75rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                                {selectedItem.role}
+                            </p>
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                Created At
+                            </label>
+                            <p style={{ fontSize: '1.125rem', color: '#1e293b', padding: '0.75rem', backgroundColor: 'white', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                                {selectedItem.createdAt}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -701,7 +807,8 @@ const AdminDashboard: React.FC = () => {
                 }
                 setViewMode('list');
             } catch (err) {
-                toast.error('Failed to save product');
+                console.error('Error saving product:', err);
+                toast.error('Failed to save product. Check console for details.');
             }
         };
 
@@ -1050,26 +1157,51 @@ const AdminDashboard: React.FC = () => {
     };
 
     const AdminForm: React.FC = () => {
-        const [formData, setFormData] = useState(selectedItem || {
-            firstName: '',
-            lastName: '',
-            email: '',
-            password: '',
-            role: 'Admin'
-        });
-
-        const handleSubmit = (e: React.FormEvent) => {
-            e.preventDefault();
-            if (viewMode === 'create') {
-                const newAdmin = {
-                    ...formData,
-                    id: Date.now().toString(),
-                    createdAt: new Date().toISOString().split('T')[0]
-                };
-                setAdmins([...admins, newAdmin]);
-                toast.success('Admin created successfully!');
+        // Explicitly type formData as Admin
+        const [formData, setFormData] = useState<Admin>(
+            selectedItem ? {
+                id: selectedItem.id,
+                firstName: selectedItem.firstName,
+                lastName: selectedItem.lastName,
+                email: selectedItem.email,
+                role: selectedItem.role,
+                password: '', // Initialize as empty string for edit mode
+                createdAt: selectedItem.createdAt
+            } : {
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                role: 'Admin',
+                createdAt: ''
             }
-            setViewMode('list');
+        );
+
+        const handleSubmit = async (e: React.FormEvent) => {
+            e.preventDefault();
+            try {
+                let updatedAdmins: Admin[];
+                if (viewMode === 'create') {
+                    const newAdmin = await registerAdmin(formData);
+                    updatedAdmins = [...admins, newAdmin];
+                    toast.success('Admin created successfully!');
+                } else {
+                    // Explicitly type updateData as Admin
+                    const updateData: Admin = { id: selectedItem.id, ...formData };
+                    if (!updateData.password) {
+                        delete updateData.password; // Safe to delete since password is optional in Admin interface
+                    }
+                    const updated = await updateAdmin(updateData);
+                    updatedAdmins = admins.map(a => a.id === updated.id ? updated : a);
+                    toast.success('Admin updated successfully!');
+                }
+                setAdmins(updatedAdmins);
+                setViewMode('list');
+                setSelectedItem(null);
+            } catch (err) {
+                console.error('Error saving admin:', err);
+                toast.error('Failed to save admin. Check console for details.');
+            }
         };
 
         return (
@@ -1081,7 +1213,7 @@ const AdminDashboard: React.FC = () => {
                 boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
             }}>
                 <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '2rem', color: '#1e293b' }}>
-                    Create New Admin
+                    {viewMode === 'create' ? 'Create New Admin' : 'Edit Admin'}
                 </h3>
 
                 <form onSubmit={handleSubmit}>
@@ -1148,7 +1280,7 @@ const AdminDashboard: React.FC = () => {
 
                             <div style={{ marginBottom: '1.5rem' }}>
                                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Password
+                                    Password {viewMode === 'edit' ? '(leave blank to keep current)' : ''}
                                 </label>
                                 <input
                                     type="password"
@@ -1161,7 +1293,7 @@ const AdminDashboard: React.FC = () => {
                                         borderRadius: '0.5rem',
                                         fontSize: '1rem'
                                     }}
-                                    required
+                                    required={viewMode === 'create'}
                                 />
                             </div>
 
@@ -1223,7 +1355,7 @@ const AdminDashboard: React.FC = () => {
                             }}
                         >
                             <Save size={16} />
-                            Create Admin
+                            {viewMode === 'create' ? 'Create Admin' : 'Save Changes'}
                         </button>
                     </div>
                 </form>
@@ -1319,7 +1451,7 @@ const AdminDashboard: React.FC = () => {
                           {item.stock}
                         </span>
                                             ) :
-                                            item[column.toLowerCase().replace(' ', '')]
+                                            item[column.toLowerCase().replace(' ', '')] || item[column.toLowerCase()]
                                     }
                                 </td>
                             ))}
@@ -1359,6 +1491,7 @@ const AdminDashboard: React.FC = () => {
                                             <Edit size={16} />
                                         </button>
                                         <button
+                                            onClick={() => handleDelete(activeTab, item)}
                                             style={{
                                                 padding: '0.5rem',
                                                 border: 'none',
@@ -1389,13 +1522,19 @@ const AdminDashboard: React.FC = () => {
             if (activeTab === 'customers' && viewMode === 'view') {
                 return renderCustomerDetails();
             }
+            if (activeTab === 'products' && viewMode === 'view') {
+                return renderProductDetails();
+            }
             if (activeTab === 'products' && (viewMode === 'create' || viewMode === 'edit')) {
                 return <ProductForm />;
             }
             if (activeTab === 'designers' && (viewMode === 'create' || viewMode === 'edit')) {
                 return <DesignerForm />;
             }
-            if (activeTab === 'admins' && viewMode === 'create') {
+            if (activeTab === 'admins' && viewMode === 'view') {
+                return renderAdminDetails();
+            }
+            if (activeTab === 'admins' && (viewMode === 'create' || viewMode === 'edit')) {
                 return <AdminForm />;
             }
         }
