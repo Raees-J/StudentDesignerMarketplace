@@ -59,3 +59,12 @@ export const updateProduct = async (product: Product): Promise<Product> => {
         inStock: true,
     };
 };
+
+export const deleteProduct = async (id: string): Promise<void> => {
+    try {
+        await axiosInstance.delete(`/products/delete/${id}`);
+    } catch (error: any) {
+        console.error(`Error deleting product with ID ${id}:`, error);
+        throw new Error(error.response?.data?.message || 'Failed to delete product');
+    }
+};

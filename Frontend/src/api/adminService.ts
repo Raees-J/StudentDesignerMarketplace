@@ -5,7 +5,7 @@ export interface Admin {
     firstName: string;
     lastName: string;
     email: string;
-    password?: string;
+    password?: string; // Ensure password is optional
     role?: string;
 }
 
@@ -69,7 +69,13 @@ export const getAdminById = async (id: number) => {
 // Update Admin
 export const updateAdmin = async (adminData: Admin) => {
     try {
-        const response = await axiosInstance.post('/admins/update', adminData);
+        // Create a copy of adminData to avoid mutating the original
+        const updateData = { ...adminData };
+        // If password is empty or undefined, remove it from the payload
+        if (!updateData.password) {
+            delete updateData.password; // Safe to delete since password is optional
+        }
+        const response = await axiosInstance.post('/admins/update', updateData);
         return response.data;
     } catch (error: any) {
         console.error('Error updating admin:', error);
