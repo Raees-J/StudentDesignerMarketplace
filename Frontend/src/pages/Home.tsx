@@ -1,9 +1,9 @@
+import { ArrowRight, HeadphonesIcon, Shield, Star, Truck } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Star, Shield, Truck, HeadphonesIcon } from 'lucide-react'
+import { getAllProducts } from '../api/productService'
 import ProductCard from '../components/ProductCard'
 import { categories, Product } from '../data/products'
-import { getAllProducts } from '../api/productService'
 
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([])
@@ -11,6 +11,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     getAllProducts().then(setProducts).catch(console.error)
   }, [])
+  // Show all products on Home if needed, or keep featured as a separate section
   const featuredProducts = products.slice(0, 8)
 
   return (

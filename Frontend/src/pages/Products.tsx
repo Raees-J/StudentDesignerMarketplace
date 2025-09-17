@@ -14,6 +14,8 @@ const Products: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  // Add category filter state
+  const [categoryFilter, setCategoryFilter] = useState('')
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -32,8 +34,12 @@ const Products: React.FC = () => {
 
   const filteredProducts = useMemo<Product[]>(() => {
     let filtered: Product[] = products;
-    if (category) {
-      filtered = filtered.filter((product: Product) => product.category === category);
+    // Use categoryFilter for dropdown, fallback to URL param for deep links
+    const effectiveCategory = categoryFilter || category || '';
+    if (effectiveCategory) {
+      filtered = filtered.filter((product: Product) =>
+        product.category && product.category.trim().toLowerCase() === effectiveCategory.trim().toLowerCase()
+      );
     }
     if (searchTerm) {
       filtered = filtered.filter((product: Product) =>
@@ -57,7 +63,7 @@ const Products: React.FC = () => {
       }
     });
     return filtered;
-  }, [products, category, searchTerm, sortBy, priceRange]);
+  }, [products, category, categoryFilter, searchTerm, sortBy, priceRange]);
 
   const currentCategory = categories.find(cat => cat.id === category)
 
@@ -209,7 +215,7 @@ const Products: React.FC = () => {
                         <label style={{ display: 'block', fontWeight: '500', marginBottom: '0.5rem' }}>
                           Category
                         </label>
-                        <select className="input">
+                        <select className="input" value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
                           <option value="">All Categories</option>
                           {categories.map(cat => (
                               <option key={cat.id} value={cat.id}>
