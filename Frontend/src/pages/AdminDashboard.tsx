@@ -1,27 +1,29 @@
 import {
+    ArrowLeft,
     DollarSign,
     Edit,
     Eye,
     LogOut,
     Package,
     Plus,
+    Save,
     ShoppingCart,
     Trash2,
     TrendingUp,
-    Users,
-    ArrowLeft,
-    Save,
-    X,
     Upload,
-    UserPlus
+    UserPlus,
+    Users,
+    X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { Admin, deleteAdmin, getAllAdmins, registerAdmin, updateAdmin } from '../api/adminService';
+import { getAllOrders } from '../api/orderService';
+import { createProduct, deleteProduct, getAllProducts, updateProduct } from '../api/productService';
+import { getAllCustomers } from '../api/profileApi';
 import { useAuth } from '../contexts/AuthContext';
-import { getAllProducts, createProduct, updateProduct, deleteProduct } from '../api/productService';
-import { getAllAdmins, registerAdmin, updateAdmin, deleteAdmin, Admin } from '../api/adminService';
-import { Product } from '../data/products';
+import { categories, Product } from '../data/products';
 
 interface DashboardStats {
     totalCustomers: number;
@@ -42,24 +44,14 @@ interface Customer {
     postalCode?: string;
 }
 
-interface Designer {
-    id: string;
-    name: string;
-    title: string;
-    bio: string;
-    image: string;
-    skills: string[];
-    productsDesigned: string[];
-    email: string;
-    portfolio: string;
-}
+
 
 const AdminDashboard: React.FC = () => {
     const { currentUser, logout, role } = useAuth();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState<'overview' | 'customers' | 'products' | 'orders' | 'designers' | 'admins'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'customers' | 'products' | 'orders' | 'admins'>('overview');
     const [viewMode, setViewMode] = useState<'list' | 'view' | 'edit' | 'create'>('list');
-    const [selectedItem, setSelectedItem] = useState<any>(null);
+    const [selectedItem, setSelectedItem] = useState<any>(null); // dropdown logic not needed, but keep for item selection
     const [stats, setStats] = useState<DashboardStats>({
         totalCustomers: 0,
         totalProducts: 0,
@@ -68,7 +60,7 @@ const AdminDashboard: React.FC = () => {
     });
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
-    const [designers, setDesigners] = useState<Designer[]>([]);
+
     const [admins, setAdmins] = useState<Admin[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -79,83 +71,39 @@ const AdminDashboard: React.FC = () => {
             navigate('/login?role=admin');
         }
         if (currentUser && role === 'admin') {
+            const loadDashboardData = async () => {
+                try {
+                    setLoading(true);
+                    // Fetch all customers
+                    const fetchedCustomers = await getAllCustomers();
+                    setCustomers(fetchedCustomers);
+                    // Fetch all products
+                    const fetchedProducts = await getAllProducts();
+                    setProducts(fetchedProducts);
+                    // Fetch all orders
+                    const fetchedOrders = await getAllOrders();
+                    // Calculate total revenue from orders
+                    const totalRevenue = fetchedOrders.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
+                    // Fetch all admins
+                    const fetchedAdmins = await getAllAdmins();
+                    setAdmins(fetchedAdmins);
+                    // Set stats from real data
+                    setStats({
+                        totalCustomers: fetchedCustomers.length,
+                        totalProducts: fetchedProducts.length,
+                        totalOrders: fetchedOrders.length,
+                        totalRevenue: totalRevenue
+                    });
+                } catch (error) {
+                    console.error('Error loading dashboard data:', error);
+                    toast.error('Failed to load dashboard data');
+                } finally {
+                    setLoading(false);
+                }
+            };
             loadDashboardData();
         }
     }, [currentUser, role, navigate]);
-
-    const loadDashboardData = async () => {
-        try {
-            setLoading(true);
-            setStats({
-                totalCustomers: 156,
-                totalProducts: 89,
-                totalOrders: 342,
-                totalRevenue: 254300
-            });
-
-            setCustomers([
-                {
-                    id: '1',
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    email: 'john@example.com',
-                    paymentMethod: 'Credit Card',
-                    address: '123 Main Street',
-                    city: 'Cape Town',
-                    province: 'Western Cape',
-                    postalCode: '8001'
-                },
-                {
-                    id: '2',
-                    firstName: 'Jane',
-                    lastName: 'Smith',
-                    email: 'jane@example.com',
-                    paymentMethod: 'PayPal',
-                    address: '456 Oak Avenue',
-                    city: 'Johannesburg',
-                    province: 'Gauteng',
-                    postalCode: '2000'
-                },
-                {
-                    id: '3',
-                    firstName: 'Mike',
-                    lastName: 'Johnson',
-                    email: 'mike@example.com',
-                    paymentMethod: 'Debit Card',
-                    address: '789 Pine Road',
-                    city: 'Durban',
-                    province: 'KwaZulu-Natal',
-                    postalCode: '4000'
-                }
-            ]);
-            const fetchedProducts = await getAllProducts();
-            setProducts(fetchedProducts);
-            setStats(prev => ({ ...prev, totalProducts: fetchedProducts.length }));
-
-            setDesigners([
-                {
-                    id: '1',
-                    name: 'Alex Thompson',
-                    title: 'Lead Product Designer',
-                    bio: 'With over 10 years of experience in product design, Alex specializes in user-centered design.',
-                    image: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg',
-                    skills: ['Product Design', 'UX Design', '3D Modeling'],
-                    productsDesigned: ['University T-Shirt', 'Study Desk'],
-                    email: 'alex@university.edu',
-                    portfolio: 'www.alexthompsondesign.com'
-                }
-            ]);
-
-            const fetchedAdmins = await getAllAdmins();
-            setAdmins(fetchedAdmins);
-
-        } catch (error) {
-            console.error('Error loading dashboard data:', error);
-            toast.error('Failed to load dashboard data');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleLogout = () => {
         logout();
@@ -310,7 +258,6 @@ const AdminDashboard: React.FC = () => {
                         { key: 'customers', label: 'Customers', icon: Users },
                         { key: 'products', label: 'Products', icon: Package },
                         { key: 'orders', label: 'Orders', icon: ShoppingCart },
-                        { key: 'designers', label: 'Designers', icon: Edit },
                         { key: 'admins', label: 'Admins', icon: UserPlus }
                     ].map(({ key, label, icon: Icon }) => (
                         <button
@@ -553,30 +500,7 @@ const AdminDashboard: React.FC = () => {
                         <Users size={20} />
                         View Customers
                     </button>
-                    <button
-                        onClick={() => {
-                            setActiveTab('designers');
-                            handleCreate();
-                        }}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '1rem 1.5rem',
-                            backgroundColor: '#8b5cf6',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '0.75rem',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
-                    >
-                        <Edit size={20} />
-                        Add Designer
-                    </button>
+
                     <button
                         onClick={() => {
                             setActiveTab('admins');
@@ -775,11 +699,14 @@ const AdminDashboard: React.FC = () => {
     };
 
     const ProductForm: React.FC = () => {
+        // Use ES6 import for categories
+        // Import at top: import { categories } from '../data/products';
         const [formData, setFormData] = useState(selectedItem || {
             name: '',
             description: '',
             price: 0,
-            image: ''
+            image: '',
+            category: categories[0].id
         });
 
         const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -815,71 +742,83 @@ const AdminDashboard: React.FC = () => {
         return (
             <div style={{
                 background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-                padding: '2rem',
-                borderRadius: '1rem',
+                padding: '3rem 2.5rem',
+                borderRadius: '1.5rem',
                 border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                boxShadow: '0 6px 24px rgba(30,41,59,0.10)',
+                maxWidth: 1100,
+                margin: '0 auto',
             }}>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '2rem', color: '#1e293b' }}>
+                <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '2.5rem', color: '#1e293b', letterSpacing: '-0.01em' }}>
                     {viewMode === 'create' ? 'Add New Product' : 'Edit Product'}
                 </h3>
                 <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                        <div>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '1rem', fontWeight: '700', color: '#374151', marginBottom: '0.75rem' }}>
                                     Image
                                 </label>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                                     {formData.image && (
-                                        <img src={formData.image} alt="Preview" style={{ width: '4rem', height: '4rem', objectFit: 'cover', borderRadius: '0.5rem' }} />
+                                        <img src={formData.image} alt="Preview" style={{ width: '5rem', height: '5rem', objectFit: 'cover', borderRadius: '0.75rem', boxShadow: '0 2px 8px rgba(59,130,246,0.10)' }} />
                                     )}
                                     <label style={{
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '0.5rem',
-                                        padding: '0.75rem 1rem',
-                                        backgroundColor: '#3b82f6',
+                                        gap: '0.7rem',
+                                        padding: '0.9rem 1.5rem',
+                                        backgroundColor: '#2563eb',
                                         color: 'white',
-                                        borderRadius: '0.5rem',
+                                        borderRadius: '0.7rem',
                                         cursor: 'pointer',
-                                        fontWeight: '500'
+                                        fontWeight: '700',
+                                        fontSize: '1rem',
+                                        boxShadow: '0 2px 8px rgba(59,130,246,0.10)'
                                     }}>
-                                        <Upload size={16} />
+                                        <Upload size={18} />
                                         Upload Image
                                         <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
                                     </label>
                                 </div>
                             </div>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '1rem', fontWeight: '700', color: '#374151', marginBottom: '0.75rem' }}>
                                     Name
                                 </label>
-                                <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem', fontSize: '1rem' }} required />
+                                <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} style={{ width: '100%', padding: '1rem', border: '1.5px solid #e2e8f0', borderRadius: '0.7rem', fontSize: '1.1rem', fontWeight: 600, background: '#f8fafc', marginBottom: 0 }} required />
                             </div>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '1rem', fontWeight: '700', color: '#374151', marginBottom: '0.75rem' }}>
                                     Price
                                 </label>
-                                <input type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })} style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem', fontSize: '1rem' }} required />
+                                <input type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })} style={{ width: '100%', padding: '1rem', border: '1.5px solid #e2e8f0', borderRadius: '0.7rem', fontSize: '1.1rem', fontWeight: 600, background: '#f8fafc', marginBottom: 0 }} required />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '1rem', fontWeight: '700', color: '#374151', marginBottom: '0.75rem' }}>
+                                    Category
+                                </label>
+                                <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} style={{ width: '100%', padding: '1rem', border: '1.5px solid #e2e8f0', borderRadius: '0.7rem', fontSize: '1.1rem', fontWeight: 600, background: '#f8fafc', marginBottom: 0 }} required>
+                                    {categories.map((cat: any) => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                         <div>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Description
-                                </label>
-                                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={6} style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.5rem', fontSize: '1rem', resize: 'vertical' }} required />
-                            </div>
+                            <label style={{ display: 'block', fontSize: '1rem', fontWeight: '700', color: '#374151', marginBottom: '0.75rem' }}>
+                                Description
+                            </label>
+                            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={8} style={{ width: '100%', padding: '1rem', border: '1.5px solid #e2e8f0', borderRadius: '0.7rem', fontSize: '1.1rem', fontWeight: 500, background: '#f8fafc', resize: 'vertical', minHeight: '8rem' }} required />
                         </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                        <button type="button" onClick={handleBackToList} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '0.5rem', fontWeight: '600', cursor: 'pointer' }}>
-                            <X size={16} />
+                    <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'flex-end', marginTop: '2.5rem' }}>
+                        <button type="button" onClick={handleBackToList} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.9rem 2.2rem', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '0.7rem', fontWeight: '700', fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(71,85,105,0.10)' }}>
+                            <X size={18} />
                             Cancel
                         </button>
-                        <button type="submit" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '0.5rem', fontWeight: '600', cursor: 'pointer' }}>
-                            <Save size={16} />
+                        <button type="submit" style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.9rem 2.2rem', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '0.7rem', fontWeight: '700', fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(16,185,129,0.10)' }}>
+                            <Save size={18} />
                             {viewMode === 'create' ? 'Create Product' : 'Save Changes'}
                         </button>
                     </div>
@@ -888,273 +827,7 @@ const AdminDashboard: React.FC = () => {
         );
     };
 
-    const DesignerForm: React.FC = () => {
-        const [formData, setFormData] = useState(selectedItem || {
-            name: '',
-            title: '',
-            bio: '',
-            image: '',
-            skills: [],
-            productsDesigned: [],
-            email: '',
-            portfolio: ''
-        });
 
-        const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const file = e.target.files?.[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    setFormData({ ...formData, image: e.target?.result as string });
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-
-        const handleSubmit = (e: React.FormEvent) => {
-            e.preventDefault();
-            if (viewMode === 'create') {
-                const newDesigner = { ...formData, id: Date.now().toString() };
-                setDesigners([...designers, newDesigner]);
-                toast.success('Designer created successfully!');
-            } else {
-                const updatedDesigners = designers.map(d => d.id === selectedItem.id ? formData : d);
-                setDesigners(updatedDesigners);
-                toast.success('Designer updated successfully!');
-            }
-            setViewMode('list');
-        };
-
-        return (
-            <div style={{
-                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-                padding: '2rem',
-                borderRadius: '1rem',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-            }}>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '2rem', color: '#1e293b' }}>
-                    {viewMode === 'create' ? 'Add New Designer' : 'Edit Designer'}
-                </h3>
-
-                <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                        <div>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Profile Image
-                                </label>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    {formData.image && (
-                                        <img
-                                            src={formData.image}
-                                            alt="Preview"
-                                            style={{ width: '4rem', height: '4rem', borderRadius: '50%', objectFit: 'cover' }}
-                                        />
-                                    )}
-                                    <label style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        padding: '0.75rem 1rem',
-                                        backgroundColor: '#3b82f6',
-                                        color: 'white',
-                                        borderRadius: '0.5rem',
-                                        cursor: 'pointer',
-                                        fontWeight: '500'
-                                    }}>
-                                        <Upload size={16} />
-                                        Upload Image
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageUpload}
-                                            style={{ display: 'none' }}
-                                        />
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Name
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '0.5rem',
-                                        fontSize: '1rem'
-                                    }}
-                                    required
-                                />
-                            </div>
-
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Title
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '0.5rem',
-                                        fontSize: '1rem'
-                                    }}
-                                    required
-                                />
-                            </div>
-
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Email
-                                </label>
-                                <input
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '0.5rem',
-                                        fontSize: '1rem'
-                                    }}
-                                    required
-                                />
-                            </div>
-
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Portfolio URL
-                                </label>
-                                <input
-                                    type="url"
-                                    value={formData.portfolio}
-                                    onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '0.5rem',
-                                        fontSize: '1rem'
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Bio
-                                </label>
-                                <textarea
-                                    value={formData.bio}
-                                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                                    rows={6}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '0.5rem',
-                                        fontSize: '1rem',
-                                        resize: 'vertical'
-                                    }}
-                                    required
-                                />
-                            </div>
-
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Skills (comma-separated)
-                                </label>
-                                <input
-                                    type="text"
-                                    value={Array.isArray(formData.skills) ? formData.skills.join(', ') : ''}
-                                    onChange={(e) => setFormData({ ...formData, skills: e.target.value.split(', ').filter(s => s.trim()) })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '0.5rem',
-                                        fontSize: '1rem'
-                                    }}
-                                    placeholder="e.g., Product Design, UX Design, 3D Modeling"
-                                />
-                            </div>
-
-                            <div style={{ marginBottom: '2rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Products Designed (comma-separated)
-                                </label>
-                                <input
-                                    type="text"
-                                    value={Array.isArray(formData.productsDesigned) ? formData.productsDesigned.join(', ') : ''}
-                                    onChange={(e) => setFormData({ ...formData, productsDesigned: e.target.value.split(', ').filter(s => s.trim()) })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '0.5rem',
-                                        fontSize: '1rem'
-                                    }}
-                                    placeholder="e.g., University T-Shirt, Study Desk"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                        <button
-                            type="button"
-                            onClick={handleBackToList}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                padding: '0.75rem 1.5rem',
-                                backgroundColor: '#6b7280',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '0.5rem',
-                                fontWeight: '600',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <X size={16} />
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                padding: '0.75rem 1.5rem',
-                                backgroundColor: '#10b981',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '0.5rem',
-                                fontWeight: '600',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <Save size={16} />
-                            {viewMode === 'create' ? 'Create Designer' : 'Save Changes'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        );
-    };
 
     const AdminForm: React.FC = () => {
         // Explicitly type formData as Admin
@@ -1165,15 +838,13 @@ const AdminDashboard: React.FC = () => {
                 lastName: selectedItem.lastName,
                 email: selectedItem.email,
                 role: selectedItem.role,
-                password: '', // Initialize as empty string for edit mode
-                createdAt: selectedItem.createdAt
+                password: '' // Initialize as empty string for edit mode
             } : {
                 firstName: '',
                 lastName: '',
                 email: '',
                 password: '',
-                role: 'Admin',
-                createdAt: ''
+                role: 'Admin'
             }
         );
 
@@ -1297,25 +968,7 @@ const AdminDashboard: React.FC = () => {
                                 />
                             </div>
 
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
-                                    Role
-                                </label>
-                                <select
-                                    value={formData.role}
-                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '0.5rem',
-                                        fontSize: '1rem'
-                                    }}
-                                >
-                                    <option value="Admin">Admin</option>
-                                    <option value="Super Admin">Super Admin</option>
-                                </select>
-                            </div>
+                            {/* Role is always Admin, dropdown removed */}
                         </div>
                     </div>
 
@@ -1528,9 +1181,7 @@ const AdminDashboard: React.FC = () => {
             if (activeTab === 'products' && (viewMode === 'create' || viewMode === 'edit')) {
                 return <ProductForm />;
             }
-            if (activeTab === 'designers' && (viewMode === 'create' || viewMode === 'edit')) {
-                return <DesignerForm />;
-            }
+
             if (activeTab === 'admins' && viewMode === 'view') {
                 return renderAdminDetails();
             }
@@ -1546,8 +1197,7 @@ const AdminDashboard: React.FC = () => {
                 return renderDataTable(customers, ['First Name', 'Last Name', 'Email', 'Payment Method']);
             case 'products':
                 return renderDataTable(products, ['Name', 'Price']);
-            case 'designers':
-                return renderDataTable(designers, ['Name', 'Title', 'Email', 'Portfolio']);
+
             case 'admins':
                 return renderDataTable(admins, ['First Name', 'Last Name', 'Email', 'Role', 'Created At']);
             case 'orders':

@@ -1,9 +1,10 @@
+import { CreditCard, User } from 'lucide-react'
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { CreditCard, User, Mail, Phone } from 'lucide-react'
-import { useCart } from '../contexts/CartContext'
-import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
+import { createOrder } from '../api/orderService'
+import { useAuth } from '../contexts/AuthContext'
+import { useCart } from '../contexts/CartContext'
 
 const Checkout: React.FC = () => {
   const { items, total, clearCart } = useCart()
@@ -11,11 +12,11 @@ const Checkout: React.FC = () => {
   const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
-    // // Billing Information
-    // firstName: currentUser?.displayName?.split(' ')[0] || '',
-    // lastName: currentUser?.displayName?.split(' ')[1] || '',
-    // email: currentUser?.email || '',
-    // phone: '',
+    // Billing Information
+    firstName: currentUser?.firstName || '',
+    lastName: currentUser?.lastName || '',
+    email: currentUser?.email || '',
+    phone: '',
 
     // Shipping Address
     address: '',
@@ -40,12 +41,27 @@ const Checkout: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000))
-
-      // Clear cart and redirect
+      if (!currentUser) throw new Error('User not logged in')
+      // Prepare order payload
+      const order = {
+        customerId: currentUser.id,
+        items: items.map(item => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          name: item.name,
+          image: item.image,
+          size: item.size,
+          color: item.color
+        })),
+        total: total,
+        address: formData.address,
+        city: formData.city,
+        province: formData.province,
+        postalCode: formData.postalCode
+      }
+      await createOrder(order)
       clearCart()
       toast.success('Order placed successfully!')
       navigate('/profile')
