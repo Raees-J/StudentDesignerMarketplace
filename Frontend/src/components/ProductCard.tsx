@@ -1,8 +1,8 @@
+import { Heart, ShoppingCart } from 'lucide-react'
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ShoppingCart, Heart } from 'lucide-react'
-import { Product } from '../data/products'
 import { useCart } from '../contexts/CartContext'
+import { Product } from '../data/products'
 
 interface ProductCardProps {
   product: Product
@@ -24,171 +24,192 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   }
 
   return (
-      <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-        <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-          {/* Image */}
-          <div style={{ position: 'relative', overflow: 'hidden' }}>
-            <img
-                src={product.image}
-                alt={product.name}
-                style={{
-                  width: '100%',
-                  height: '250px',
-                  objectFit: 'cover',
-                  transition: 'transform 0.3s ease'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)'
-                }}
-            />
-
-            {/* Stock Badge */}
-            <div style={{
-              position: 'absolute',
-              top: '0.75rem',
-              left: '0.75rem',
-              backgroundColor: product.inStock ? '#10b981' : '#ef4444',
-              color: 'white',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              fontSize: '0.75rem',
-              fontWeight: '500'
-            }}>
-              {product.inStock ? 'In Stock' : 'Out of Stock'}
-            </div>
-
-            {/* Wishlist Button */}
-            <button
-                style={{
-                  position: 'absolute',
-                  top: '0.75rem',
-                  right: '0.75rem',
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '2.5rem',
-                  height: '2.5rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white'
-                  e.currentTarget.style.transform = 'scale(1.1)'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'
-                  e.currentTarget.style.transform = 'scale(1)'
-                }}
-            >
-              <Heart size={16} style={{ color: '#6b7280' }} />
-            </button>
+    <div
+      className="product-card-modern"
+      style={{
+        background: 'white',
+        borderRadius: '1.25rem',
+        boxShadow: '0 6px 24px 0 rgba(30,41,59,0.10)',
+        overflow: 'hidden',
+        transition: 'box-shadow 0.3s',
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 400,
+        position: 'relative',
+      }}
+    >
+      <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}>
+        {/* Image Section */}
+        <div style={{ position: 'relative', width: '100%', height: 260, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img
+            src={product.image}
+            alt={product.name}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderTopLeftRadius: '1.25rem',
+              borderTopRightRadius: '1.25rem',
+              transition: 'transform 0.3s',
+            }}
+            onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.04)')}
+            onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+          />
+          {/* Stock Badge */}
+          <div style={{
+            position: 'absolute',
+            top: '1rem',
+            left: '1rem',
+            backgroundColor: product.inStock ? '#10b981' : '#ef4444',
+            color: 'white',
+            padding: '0.35rem 0.75rem',
+            borderRadius: '0.5rem',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            boxShadow: '0 2px 8px rgba(16,185,129,0.10)',
+            zIndex: 2,
+          }}>
+            {product.inStock ? 'In Stock' : 'Out of Stock'}
           </div>
-
-          {/* Content */}
-          <div style={{ padding: '1.25rem' }}>
-            {/* Category */}
-            <div style={{
-              display: 'inline-block',
-              backgroundColor: '#eff6ff',
-              color: '#3b82f6',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              fontSize: '0.75rem',
-              fontWeight: '500',
-              textTransform: 'capitalize',
-              marginBottom: '0.5rem'
-            }}>
-              {product.category}
-            </div>
-
-            {/* Name */}
-            <h3 style={{
-              fontSize: '1.125rem',
-              fontWeight: '600',
-              color: '#1f2937',
-              marginBottom: '0.5rem',
-              lineHeight: '1.4'
-            }}>
-              {product.name}
-            </h3>
-
-            {/* Description */}
-            <p style={{
-              color: '#6b7280',
-              fontSize: '0.875rem',
-              lineHeight: '1.5',
-              marginBottom: '1rem',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden'
-            }}>
-              {product.description}
-            </p>
-
-            {/* Features */}
-            {product.features && product.features.length > 0 && (
-                <div style={{ marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
-                    {product.features.slice(0, 2).map((feature, index) => (
-                        <span
-                            key={index}
-                            style={{
-                              backgroundColor: '#f3f4f6',
-                              color: '#4b5563',
-                              padding: '0.125rem 0.375rem',
-                              borderRadius: '0.25rem',
-                              fontSize: '0.75rem'
-                            }}
-                        >
-                    {feature}
-                  </span>
-                    ))}
-                  </div>
-                </div>
-            )}
-
-            {/* Price and Actions */}
-            <div style={{
+          {/* Wishlist Button */}
+          <button
+            style={{
+              position: 'absolute',
+              top: '1rem',
+              right: '1rem',
+              backgroundColor: 'rgba(255,255,255,0.95)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '2.5rem',
+              height: '2.5rem',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: 'auto'
-            }}>
-              <div>
-              <span style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: '#1f2937'
-              }}>
-                R{product.price}
-              </span>
-              </div>
-
-              <button
-                  onClick={handleAddToCart}
-                  disabled={!product.inStock}
-                  className={`btn ${product.inStock ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    fontSize: '0.875rem',
-                    opacity: product.inStock ? 1 : 0.6,
-                    cursor: product.inStock ? 'pointer' : 'not-allowed'
-                  }}
-              >
-                <ShoppingCart size={16} />
-                Add to Cart
-              </button>
-            </div>
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
+              transition: 'all 0.2s',
+            }}
+            onMouseOver={e => {
+              e.currentTarget.style.backgroundColor = '#f1f5f9';
+              e.currentTarget.style.transform = 'scale(1.1)';
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.95)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+            tabIndex={-1}
+            aria-label="Add to wishlist"
+          >
+            <Heart size={18} style={{ color: '#64748b' }} />
+          </button>
+        </div>
+        {/* Content Section */}
+        <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          {/* Category */}
+          <div style={{
+            display: 'inline-block',
+            backgroundColor: '#e0e7ef',
+            color: '#2563eb',
+            padding: '0.3rem 0.7rem',
+            borderRadius: '0.4rem',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            textTransform: 'capitalize',
+            marginBottom: '0.7rem',
+            letterSpacing: '0.01em',
+          }}>
+            {product.category}
           </div>
-        </Link>
-      </div>
+          {/* Name */}
+          <h3 style={{
+            fontSize: '1.25rem',
+            fontWeight: 700,
+            color: '#1e293b',
+            marginBottom: '0.5rem',
+            lineHeight: 1.3,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}>
+            {product.name}
+          </h3>
+          {/* Description */}
+          <p style={{
+            color: '#64748b',
+            fontSize: '0.97rem',
+            lineHeight: 1.5,
+            marginBottom: '1.1rem',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            minHeight: '2.5em',
+          }}>
+            {product.description}
+          </p>
+          {/* Features */}
+          {product.features && product.features.length > 0 && (
+            <div style={{ marginBottom: '1.1rem', display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+              {product.features.slice(0, 2).map((feature, index) => (
+                <span
+                  key={index}
+                  style={{
+                    backgroundColor: '#f3f4f6',
+                    color: '#334155',
+                    padding: '0.18rem 0.6rem',
+                    borderRadius: '0.3rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  {feature}
+                </span>
+              ))}
+            </div>
+          )}
+          {/* Price and Actions */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: 'auto',
+            gap: '1rem',
+          }}>
+            <span style={{
+              fontSize: '1.6rem',
+              fontWeight: 800,
+              color: '#0f172a',
+              letterSpacing: '-0.01em',
+            }}>
+              R{product.price}
+            </span>
+            <button
+              onClick={handleAddToCart}
+              disabled={!product.inStock}
+              style={{
+                padding: '0.7rem 1.3rem',
+                fontSize: '1rem',
+                fontWeight: 600,
+                borderRadius: '0.6rem',
+                background: product.inStock ? 'linear-gradient(90deg,#3b82f6 0%,#2563eb 100%)' : '#cbd5e1',
+                color: 'white',
+                border: 'none',
+                opacity: product.inStock ? 1 : 0.6,
+                cursor: product.inStock ? 'pointer' : 'not-allowed',
+                boxShadow: product.inStock ? '0 2px 8px rgba(59,130,246,0.10)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s',
+              }}
+            >
+              <ShoppingCart size={18} />
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </Link>
+    </div>
   )
 }
 

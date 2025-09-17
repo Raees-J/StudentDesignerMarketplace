@@ -1,8 +1,9 @@
 import { Filter, Grid, List, Search } from 'lucide-react'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { getAllProducts } from '../api/productService'
 import ProductCard from '../components/ProductCard'
-import { categories, products } from '../data/products'
+import { categories, Product } from '../data/products'
 
 const Products: React.FC = () => {
   const { category } = useParams()
@@ -11,44 +12,52 @@ const Products: React.FC = () => {
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 })
   const [showFilters, setShowFilters] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredProducts = useMemo(() => {
-    let filtered = products
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true)
+      try {
+        const data = await getAllProducts()
+        setProducts(data)
+      } catch (err) {
+        setProducts([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProducts()
+  }, [])
 
-    // Filter by category
+  const filteredProducts = useMemo<Product[]>(() => {
+    let filtered: Product[] = products;
     if (category) {
-      filtered = filtered.filter(product => product.category === category)
+      filtered = filtered.filter((product: Product) => product.category === category);
     }
-
-    // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(product =>
-          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      filtered = filtered.filter((product: Product) =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
-
-    // Filter by price range
-    filtered = filtered.filter(product =>
-        product.price >= priceRange.min && product.price <= priceRange.max
-    )
-
-    // Sort products
-    filtered.sort((a, b) => {
+    filtered = filtered.filter((product: Product) =>
+      product.price >= priceRange.min && product.price <= priceRange.max
+    );
+    filtered.sort((a: Product, b: Product) => {
       switch (sortBy) {
         case 'price-low':
-          return a.price - b.price
+          return a.price - b.price;
         case 'price-high':
-          return b.price - a.price
+          return b.price - a.price;
         case 'name':
-          return a.name.localeCompare(b.name)
+          return a.name.localeCompare(b.name);
         default:
-          return 0
+          return 0;
       }
-    })
-
-    return filtered
-  }, [category, searchTerm, sortBy, priceRange])
+    });
+    return filtered;
+  }, [products, category, searchTerm, sortBy, priceRange]);
 
   const currentCategory = categories.find(cat => cat.id === category)
 
