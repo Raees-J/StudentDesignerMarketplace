@@ -77,6 +77,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         minHeight: 420,
         position: 'relative',
         margin: '0.7rem',
+        minWidth: 320,
+        maxWidth: 400,
+        width: '100%',
       }}
     >
       {showModal && <ImageModal />}

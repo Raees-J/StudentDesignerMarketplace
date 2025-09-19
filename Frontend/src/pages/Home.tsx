@@ -264,7 +264,21 @@ const Home: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4" style={{ gap: '1.5rem' }}>
+          <div
+            className="product-card-grid"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+              gap: '2.5rem',
+              justifyContent: 'center',
+              alignItems: 'stretch',
+              margin: '0 auto',
+              paddingBottom: '2rem',
+              minHeight: 400,
+              width: '100%',
+              maxWidth: '1400px',
+            }}
+          >
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
