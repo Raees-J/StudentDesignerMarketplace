@@ -55,14 +55,6 @@ const Home: React.FC = () => {
                   Shop Now
                   <ArrowRight size={20} />
                 </Link>
-                <Link to="/products/apparel" className="btn btn-outline" style={{
-                  borderColor: 'white',
-                  color: 'white',
-                  padding: '1rem 2rem',
-                  fontSize: '1rem'
-                }}>
-                  View Apparel
-                </Link>
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>
