@@ -1,11 +1,12 @@
 package za.ac.cput.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import za.ac.cput.domain.Product;
 import za.ac.cput.repository.ProductRepository;
-
-import java.util.List;
 
 @Service
 public class ProductService implements IProductService {
@@ -25,6 +26,7 @@ public class ProductService implements IProductService {
                 .setDescription(product.getDescription())
                 .setPrice(product.getPrice())
                 .setImageUrl(product.getImageUrl())
+                .setCategory(product.getCategory())
                 .build();
         return repository.save(newProduct);
     }
@@ -43,6 +45,7 @@ public class ProductService implements IProductService {
                     .setDescription(product.getDescription())
                     .setPrice(product.getPrice())
                     .setImageUrl(product.getImageUrl())
+                    .setCategory(product.getCategory())
                     .build();
             return repository.save(updated);
         }

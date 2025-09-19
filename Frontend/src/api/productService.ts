@@ -1,11 +1,16 @@
-import axiosInstance from './axiosInstance';
 import type { Product } from '../data/products';
+import axiosInstance from './axiosInstance';
 
 export interface NewProduct {
     name: string;
     description: string;
     price: number;
     image: string;
+    category?: string;
+    inStock?: boolean;
+    sizes?: string[];
+    colors?: string[];
+    features?: string[];
 }
 
 export const getAllProducts = async (): Promise<Product[]> => {
@@ -16,8 +21,11 @@ export const getAllProducts = async (): Promise<Product[]> => {
         description: p.description,
         price: p.price,
         image: p.imageUrl,
-        category: 'general',
-        inStock: true,
+        category: p.category && p.category.trim() ? p.category : 'Uncategorized',
+        inStock: typeof p.inStock === 'boolean' ? p.inStock : true,
+        sizes: p.sizes,
+        colors: p.colors,
+        features: p.features,
     }));
 };
 
@@ -27,6 +35,11 @@ export const createProduct = async (product: NewProduct): Promise<Product> => {
         description: product.description,
         price: product.price,
         imageUrl: product.image,
+        category: product.category,
+        inStock: typeof product.inStock === 'boolean' ? product.inStock : true,
+        sizes: product.sizes,
+        colors: product.colors,
+        features: product.features,
     });
     const p = response.data;
     return {
@@ -35,8 +48,11 @@ export const createProduct = async (product: NewProduct): Promise<Product> => {
         description: p.description,
         price: p.price,
         image: p.imageUrl,
-        category: 'general',
-        inStock: true,
+        category: p.category || 'general',
+        inStock: typeof p.inStock === 'boolean' ? p.inStock : true,
+        sizes: p.sizes,
+        colors: p.colors,
+        features: p.features,
     };
 };
 
@@ -47,6 +63,11 @@ export const updateProduct = async (product: Product): Promise<Product> => {
         description: product.description,
         price: product.price,
         imageUrl: product.image,
+        category: product.category,
+        inStock: typeof product.inStock === 'boolean' ? product.inStock : true,
+        sizes: product.sizes,
+        colors: product.colors,
+        features: product.features,
     });
     const p = response.data;
     return {
@@ -55,8 +76,11 @@ export const updateProduct = async (product: Product): Promise<Product> => {
         description: p.description,
         price: p.price,
         image: p.imageUrl,
-        category: 'general',
-        inStock: true,
+        category: p.category && p.category.trim() ? p.category : 'Uncategorized',
+        inStock: typeof p.inStock === 'boolean' ? p.inStock : true,
+        sizes: p.sizes,
+        colors: p.colors,
+        features: p.features,
     };
 };
 

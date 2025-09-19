@@ -1,5 +1,5 @@
-import { Heart, ShoppingCart } from 'lucide-react'
-import React from 'react'
+import { Heart, ShoppingCart, X } from 'lucide-react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import { Product } from '../data/products'
@@ -10,11 +10,11 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addItem } = useCart()
+  const [showModal, setShowModal] = useState(false)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-
     addItem({
       id: product.id,
       name: product.name,
@@ -23,24 +23,66 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     })
   }
 
+  // Modal for image view
+  const ImageModal = () => (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      background: 'rgba(0,0,0,0.7)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000
+    }} onClick={() => setShowModal(false)}>
+      <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }} onClick={e => e.stopPropagation()}>
+        <img src={product.image} alt={product.name} style={{
+          maxWidth: '80vw',
+          maxHeight: '80vh',
+          borderRadius: '1.2rem',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.25)'
+        }} />
+        <button onClick={() => setShowModal(false)} style={{
+          position: 'absolute',
+          top: 10,
+          right: 10,
+          background: 'rgba(255,255,255,0.85)',
+          border: 'none',
+          borderRadius: '50%',
+          width: 36,
+          height: 36,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.10)'
+        }}><X size={22} color="#334155" /></button>
+      </div>
+    </div>
+  )
+
   return (
     <div
       className="product-card-modern"
       style={{
         background: 'white',
-        borderRadius: '1.25rem',
-        boxShadow: '0 6px 24px 0 rgba(30,41,59,0.10)',
+        borderRadius: '1.5rem',
+        boxShadow: '0 8px 32px 0 rgba(30,41,59,0.13)',
         overflow: 'hidden',
         transition: 'box-shadow 0.3s',
         display: 'flex',
         flexDirection: 'column',
-        minHeight: 400,
+        minHeight: 420,
         position: 'relative',
+        margin: '0.7rem',
       }}
     >
+      {showModal && <ImageModal />}
       <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}>
         {/* Image Section */}
-        <div style={{ position: 'relative', width: '100%', height: 260, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+  <div style={{ position: 'relative', width: '100%', height: 260, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
           <img
             src={product.image}
             alt={product.name}
@@ -48,12 +90,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              borderTopLeftRadius: '1.25rem',
-              borderTopRightRadius: '1.25rem',
+              borderTopLeftRadius: '1.5rem',
+              borderTopRightRadius: '1.5rem',
               transition: 'transform 0.3s',
+              boxShadow: '0 2px 12px rgba(30,41,59,0.07)'
             }}
-            onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.04)')}
+            onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.045)')}
             onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+            onClick={e => { e.preventDefault(); setShowModal(true); }}
           />
           {/* Stock Badge */}
           <div style={{
@@ -103,30 +147,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <Heart size={18} style={{ color: '#64748b' }} />
           </button>
         </div>
-        {/* Content Section */}
-        <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+  {/* Content Section */}
+  <div style={{ padding: '1.7rem 1.3rem 1.3rem 1.3rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '0.7rem' }}>
           {/* Category */}
           <div style={{
             display: 'inline-block',
             backgroundColor: '#e0e7ef',
             color: '#2563eb',
-            padding: '0.3rem 0.7rem',
-            borderRadius: '0.4rem',
-            fontSize: '0.85rem',
+            padding: '0.32rem 0.8rem',
+            borderRadius: '0.5rem',
+            fontSize: '0.92rem',
             fontWeight: 600,
             textTransform: 'capitalize',
-            marginBottom: '0.7rem',
+            marginBottom: '0.8rem',
             letterSpacing: '0.01em',
           }}>
             {product.category}
           </div>
           {/* Name */}
           <h3 style={{
-            fontSize: '1.25rem',
+            fontSize: '1.32rem',
             fontWeight: 700,
             color: '#1e293b',
-            marginBottom: '0.5rem',
-            lineHeight: 1.3,
+            marginBottom: '0.4rem',
+            lineHeight: 1.25,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -136,9 +180,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {/* Description */}
           <p style={{
             color: '#64748b',
-            fontSize: '0.97rem',
-            lineHeight: 1.5,
-            marginBottom: '1.1rem',
+            fontSize: '1.01rem',
+            lineHeight: 1.55,
+            marginBottom: '1.05rem',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -149,7 +193,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </p>
           {/* Features */}
           {product.features && product.features.length > 0 && (
-            <div style={{ marginBottom: '1.1rem', display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+            <div style={{ marginBottom: '1.05rem', display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
               {product.features.slice(0, 2).map((feature, index) => (
                 <span
                   key={index}
@@ -173,10 +217,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             alignItems: 'center',
             justifyContent: 'space-between',
             marginTop: 'auto',
-            gap: '1rem',
+            gap: '1.2rem',
+            paddingTop: '0.7rem',
           }}>
             <span style={{
-              fontSize: '1.6rem',
+              fontSize: '1.7rem',
               fontWeight: 800,
               color: '#0f172a',
               letterSpacing: '-0.01em',
@@ -187,10 +232,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               onClick={handleAddToCart}
               disabled={!product.inStock}
               style={{
-                padding: '0.7rem 1.3rem',
-                fontSize: '1rem',
+                padding: '0.8rem 1.5rem',
+                fontSize: '1.07rem',
                 fontWeight: 600,
-                borderRadius: '0.6rem',
+                borderRadius: '0.7rem',
                 background: product.inStock ? 'linear-gradient(90deg,#3b82f6 0%,#2563eb 100%)' : '#cbd5e1',
                 color: 'white',
                 border: 'none',
@@ -199,11 +244,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 boxShadow: product.inStock ? '0 2px 8px rgba(59,130,246,0.10)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem',
+                gap: '0.6rem',
                 transition: 'all 0.2s',
               }}
             >
-              <ShoppingCart size={18} />
+              <ShoppingCart size={19} />
               Add to Cart
             </button>
           </div>

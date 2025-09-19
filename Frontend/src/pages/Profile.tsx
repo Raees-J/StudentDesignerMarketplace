@@ -1,8 +1,9 @@
-import { LogOut, Package, Settings, User } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { changePassword, deleteAccount, getProfile, updateProfile } from '../api/profileApi'
-import { useAuth } from '../contexts/AuthContext'
-import { useCart } from '../contexts/CartContext'
+
+import { LogOut, Package, Settings, User } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { changePassword, deleteAccount, getProfile, updateProfile } from '../api/profileApi';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 const Profile: React.FC = () => {
   const { currentUser, logout } = useAuth()
@@ -22,36 +23,9 @@ const Profile: React.FC = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const [orders] = useState([
-    {
-      id: 'ORD-001',
-      date: '2024-01-15',
-      status: 'Delivered',
-      total: 299.99,
-      items: [
-        { name: 'University Hoodie', quantity: 1, price: 199.99 },
-        { name: 'Campus Mug', quantity: 2, price: 50.00 }
-      ]
-    },
-    {
-      id: 'ORD-002',
-      date: '2024-01-10',
-      status: 'Processing',
-      total: 149.99,
-      items: [
-        { name: 'Study Chair', quantity: 1, price: 149.99 }
-      ]
-    },
-    {
-      id: 'ORD-003',
-      date: '2024-01-05',
-      status: 'Shipped',
-      total: 79.99,
-      items: [
-        { name: 'University T-Shirt', quantity: 1, price: 79.99 }
-      ]
-    }
-  ])
+  const [orders, setOrders] = useState<any[]>([])
+  const [ordersLoading, setOrdersLoading] = useState(false)
+  const [ordersError, setOrdersError] = useState("")
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -161,10 +135,10 @@ const Profile: React.FC = () => {
                   fontSize: '1.5rem',
                   fontWeight: '600'
                 }}>
-                  {currentUser?.displayName?.charAt(0) || currentUser?.email?.charAt(0) || 'U'}
+                  {currentUser?.name?.charAt(0) || currentUser?.email?.charAt(0) || 'U'}
                 </div>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.25rem' }}>
-                  {currentUser?.displayName || 'User'}
+                  {currentUser?.name || 'User'}
                 </h3>
                 <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
                   {currentUser?.email}
@@ -344,49 +318,75 @@ const Profile: React.FC = () => {
                   </h2>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {orders.map((order) => (
-                        <div key={order.id} className="card" style={{ padding: '1.5rem', backgroundColor: '#f9fafb' }}>
+                    {ordersLoading && <p>Loading orders...</p>}
+                    {ordersError && <p style={{ color: 'red' }}>{ordersError}</p>}
+                    {!ordersLoading && !ordersError && orders.length === 0 && (
+                      <p style={{ color: '#6b7280' }}>No orders found.</p>
+                    )}
+                    {!ordersLoading && !ordersError && orders.length > 0 && orders.map((order: any) => {
+                      // Map backend fields to UI fields
+                      const orderId = order.id || order.orderId || order._id || 'N/A';
+                      const orderDate = order.date || order.createdAt || order.orderDate || '';
+                      const orderStatus = order.status || 'Processing';
+                      const orderTotal = order.total || order.amount || order.price || 0;
+                      // Items: try to support both array of products or single product
+                      let items: any[] = [];
+                      if (Array.isArray(order.items) && order.items.length > 0) {
+                        items = order.items.map((item: any) => ({
+                          name: item.name || item.productName || item.title || 'Product',
+                          quantity: item.quantity || 1,
+                          price: item.price || item.amount || 0
+                        }));
+                      } else if (order.productName) {
+                        items = [{
+                          name: order.productName,
+                          quantity: order.quantity || 1,
+                          price: order.price || order.amount || 0
+                        }];
+                      }
+                      return (
+                        <div key={orderId} className="card" style={{ padding: '1.5rem', backgroundColor: '#f9fafb' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
                             <div>
                               <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.25rem' }}>
-                                Order #{order.id}
+                                Order #{orderId}
                               </h3>
                               <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                Placed on {new Date(order.date).toLocaleDateString()}
+                                Placed on {orderDate ? new Date(orderDate).toLocaleDateString() : 'N/A'}
                               </p>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                        <span style={{
-                          backgroundColor: getStatusColor(order.status),
-                          color: 'white',
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: '9999px',
-                          fontSize: '0.75rem',
-                          fontWeight: '500'
-                        }}>
-                          {order.status}
-                        </span>
+                              <span style={{
+                                backgroundColor: getStatusColor(orderStatus),
+                                color: 'white',
+                                padding: '0.25rem 0.75rem',
+                                borderRadius: '9999px',
+                                fontSize: '0.75rem',
+                                fontWeight: '500'
+                              }}>
+                                {orderStatus}
+                              </span>
                               <p style={{ fontSize: '1.125rem', fontWeight: '600', marginTop: '0.5rem' }}>
-                                R{order.total.toFixed(2)}
+                                R{Number(orderTotal).toFixed(2)}
                               </p>
                             </div>
                           </div>
-
                           <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '1rem' }}>
-                            {order.items.map((item, index) => (
-                                <div key={index} style={{
-                                  display: 'flex',
-                                  justifyContent: 'space-between',
-                                  marginBottom: '0.5rem',
-                                  fontSize: '0.875rem'
-                                }}>
-                                  <span>{item.name} × {item.quantity}</span>
-                                  <span>R{item.price.toFixed(2)}</span>
-                                </div>
+                            {items.map((item, index) => (
+                              <div key={index} style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                marginBottom: '0.5rem',
+                                fontSize: '0.875rem'
+                              }}>
+                                <span>{item.name} × {item.quantity}</span>
+                                <span>R{Number(item.price).toFixed(2)}</span>
+                              </div>
                             ))}
                           </div>
                         </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
             )}

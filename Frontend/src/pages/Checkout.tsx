@@ -43,28 +43,23 @@ const Checkout: React.FC = () => {
     setLoading(true)
     try {
       if (!currentUser) throw new Error('User not logged in')
-      // Prepare order payload
-      const order = {
-        customerId: currentUser.id,
-        items: items.map(item => ({
-          productId: item.id,
-          quantity: item.quantity,
-          price: item.price,
-          name: item.name,
-          image: item.image,
-          size: item.size,
-          color: item.color
-        })),
-        total: total,
-        address: formData.address,
-        city: formData.city,
-        province: formData.province,
-        postalCode: formData.postalCode
+      // Only allow single-item checkout for backend compatibility
+      if (items.length !== 1) {
+        toast.error('You can only checkout one item at a time. Please remove extra items from your cart.');
+        setLoading(false);
+        return;
       }
-      await createOrder(order)
-      clearCart()
-      toast.success('Order placed successfully!')
-      navigate('/profile')
+      const item = items[0];
+      const order = {
+        productID: item.id,
+        customerID: currentUser.id,
+        quantity: item.quantity,
+        total: item.price * item.quantity
+      };
+      await createOrder(order);
+      clearCart();
+      toast.success('Order placed successfully!');
+      navigate('/profile');
     } catch (error) {
       toast.error('Failed to process payment. Please try again.')
     } finally {
