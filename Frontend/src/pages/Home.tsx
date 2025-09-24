@@ -3,13 +3,18 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getAllProducts } from '../api/productService'
 import ProductCard from '../components/ProductCard'
-import { categories, Product } from '../data/products'
+import { Product, products as staticProducts } from '../data/products'
 
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
-    getAllProducts().then(setProducts).catch(console.error)
+    getAllProducts()
+      .then(setProducts)
+      .catch((err) => {
+        console.warn('Backend not available, falling back to static data:', err)
+        setProducts(staticProducts)
+      })
   }, [])
   // Show all products on Home if needed, or keep featured as a separate section
   const featuredProducts = products.slice(0, 8)
@@ -18,7 +23,7 @@ const Home: React.FC = () => {
     <div>
       
       <section style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #6B7AA1 0%, #4B5876 100%)', // grayish blue
         color: 'white',
         padding: '4rem 0'
       }}>
@@ -54,14 +59,6 @@ const Home: React.FC = () => {
                 }}>
                   Shop Now
                   <ArrowRight size={20} />
-                </Link>
-                <Link to="/products/apparel" className="btn btn-outline" style={{
-                  borderColor: 'white',
-                  color: 'white',
-                  padding: '1rem 2rem',
-                  fontSize: '1rem'
-                }}>
-                  View Apparel
                 </Link>
               </div>
             </div>
@@ -176,79 +173,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section style={{ padding: '4rem 0' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              color: '#1f2937',
-              marginBottom: '1rem'
-            }}>
-              Shop by Category
-            </h2>
-            <p style={{
-              fontSize: '1.125rem',
-              color: '#6b7280',
-              maxWidth: '600px',
-              margin: '0 auto'
-            }}>
-              Explore our wide range of university merchandise and equipment
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-4" style={{ gap: '1.5rem' }}>
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                to={`/products/${category.id}`}
-                className="card"
-                style={{
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  padding: '2rem',
-                  textAlign: 'center',
-                  transition: 'transform 0.2s ease'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                }}
-              >
-                <h3 style={{
-                  fontSize: '1.5rem',
-                  fontWeight: '600',
-                  color: '#1f2937',
-                  marginBottom: '0.5rem'
-                }}>
-                  {category.name}
-                </h3>
-                <p style={{
-                  color: '#6b7280',
-                  fontSize: '0.875rem',
-                  marginBottom: '1rem'
-                }}>
-                  {category.description}
-                </p>
-                <div style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  color: '#3b82f6',
-                  fontWeight: '500',
-                  fontSize: '0.875rem'
-                }}>
-                  Shop Now
-                  <ArrowRight size={16} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Featured Products */}
       <section style={{ padding: '4rem 0', backgroundColor: '#f9fafb' }}>
@@ -272,7 +196,21 @@ const Home: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4" style={{ gap: '1.5rem' }}>
+          <div
+            className="product-card-grid"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+              gap: '2.5rem',
+              justifyContent: 'center',
+              alignItems: 'stretch',
+              margin: '0 auto',
+              paddingBottom: '2rem',
+              minHeight: 400,
+              width: '100%',
+              maxWidth: '1400px',
+            }}
+          >
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

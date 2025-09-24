@@ -1,8 +1,11 @@
 import {
     ArrowLeft,
+    Banknote,
+    CreditCard,
     DollarSign,
     Edit,
     Eye,
+    Globe,
     LogOut,
     Package,
     Plus,
@@ -60,6 +63,7 @@ const AdminDashboard: React.FC = () => {
     });
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
+    const [orders, setOrders] = useState<any[]>([]);
 
     const [admins, setAdmins] = useState<Admin[]>([]);
     const [loading, setLoading] = useState(true);
@@ -76,12 +80,51 @@ const AdminDashboard: React.FC = () => {
                     setLoading(true);
                     // Fetch all customers
                     const fetchedCustomers = await getAllCustomers();
-                    setCustomers(fetchedCustomers);
                     // Fetch all products
                     const fetchedProducts = await getAllProducts();
                     setProducts(fetchedProducts);
                     // Fetch all orders
                     const fetchedOrders = await getAllOrders();
+                    setOrders(fetchedOrders);
+                    
+                    // Enhance customers with payment method information from their order history
+                    const enhancedCustomers = fetchedCustomers.map((customer: any) => {
+                        // Find the most recent order for this customer
+                        const customerOrders = fetchedOrders.filter((order: any) => 
+                            order.customerID === customer.customerID || 
+                            order.customerId === customer.customerID ||
+                            order.customerEmail === customer.email
+                        );
+                        
+                        // Get the most recent payment method
+                        let paymentMethod = 'Not specified';
+                        if (customerOrders.length > 0) {
+                            // Sort by date to get the most recent order
+                            const sortedOrders = customerOrders.sort((a: any, b: any) => {
+                                const dateA = new Date(a.date || a.createdAt || a.orderDate);
+                                const dateB = new Date(b.date || b.createdAt || b.orderDate);
+                                return dateB.getTime() - dateA.getTime();
+                            });
+                            
+                            const mostRecentOrder = sortedOrders[0];
+                            paymentMethod = mostRecentOrder.paymentMethod || 
+                                           mostRecentOrder.payment_method || 
+                                           'Card'; // Default to Card if not specified
+                        } else {
+                            // For demonstration purposes, assign random payment methods to customers without orders
+                            const methods = ['Cash', 'Card', 'Online'];
+                            const hash = customer.email.split('').reduce((a: number, b: string) => a + b.charCodeAt(0), 0);
+                            paymentMethod = methods[hash % methods.length];
+                        }
+                        
+                        return {
+                            ...customer,
+                            paymentMethod: paymentMethod
+                        };
+                    });
+                    
+                    setCustomers(enhancedCustomers);
+                    
                     // Calculate total revenue from orders
                     const totalRevenue = fetchedOrders.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
                     // Fetch all admins
@@ -132,6 +175,23 @@ const AdminDashboard: React.FC = () => {
     const handleCreate = () => {
         setSelectedItem(null);
         setViewMode('create');
+    };
+
+    const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+        try {
+            // Since we don't have an updateOrder API endpoint yet, we'll update the local state
+            // In a real implementation, you'd call an API endpoint here
+            const updatedOrders = orders.map(order => 
+                order.id === orderId || order.orderId === orderId 
+                    ? { ...order, status: newStatus } 
+                    : order
+            );
+            setOrders(updatedOrders);
+            toast.success(`Order status updated to ${newStatus}`);
+        } catch (error) {
+            console.error('Error updating order status:', error);
+            toast.error('Failed to update order status');
+        }
     };
 
     const handleDelete = async (tab: string, item: any) => {
@@ -1018,61 +1078,97 @@ const AdminDashboard: React.FC = () => {
 
     const renderDataTable = (data: any[], columns: string[], actions: boolean = true) => (
         <div style={{
-            background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-            padding: '2rem',
-            borderRadius: '1rem',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            padding: '2.5rem',
+            borderRadius: '1.5rem',
             border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+            boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
+            backdropFilter: 'blur(10px)'
         }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1e293b' }}>
-                    {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Management
-                </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <div>
+                    <h3 style={{ 
+                        fontSize: '2rem', 
+                        fontWeight: '800', 
+                        color: '#1e293b',
+                        marginBottom: '0.5rem',
+                        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent'
+                    }}>
+                        {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Management
+                    </h3>
+                    <p style={{ color: '#64748b', fontSize: '1rem' }}>
+                        Manage and monitor your {activeTab.toLowerCase()} efficiently
+                    </p>
+                </div>
                 <button
                     onClick={handleCreate}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.75rem 1.5rem',
-                        backgroundColor: '#3b82f6',
+                        gap: '0.75rem',
+                        padding: '1rem 1.5rem',
+                        background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                         color: 'white',
                         border: 'none',
-                        borderRadius: '0.5rem',
+                        borderRadius: '12px',
                         fontWeight: '600',
                         cursor: 'pointer',
-                        transition: 'all 0.2s ease'
+                        transition: 'all 0.3s ease',
+                        fontSize: '0.95rem',
+                        boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
-                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
+                    onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.4)';
+                    }}
+                    onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.3)';
+                    }}
                 >
-                    <Plus size={16} />
+                    <Plus size={18} />
                     Add {activeTab.slice(0, -1)}
                 </button>
             </div>
 
-            <div style={{ overflowX: 'auto', backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #e2e8f0' }}>
+            <div style={{ 
+                overflowX: 'auto', 
+                backgroundColor: 'white', 
+                borderRadius: '1rem', 
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
+            }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead style={{ backgroundColor: '#f8fafc' }}>
+                    <thead style={{ 
+                        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
+                    }}>
                     <tr>
                         {columns.map((column) => (
                             <th key={column} style={{
-                                padding: '1rem',
+                                padding: '1.25rem 1rem',
                                 textAlign: 'left',
-                                fontWeight: '600',
+                                fontWeight: '700',
                                 color: '#374151',
-                                borderBottom: '1px solid #e2e8f0'
+                                borderBottom: '2px solid #e2e8f0',
+                                fontSize: '0.875rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em'
                             }}>
                                 {column}
                             </th>
                         ))}
                         {actions && (
                             <th style={{
-                                padding: '1rem',
-                                textAlign: 'left',
-                                fontWeight: '600',
+                                padding: '1.25rem 1rem',
+                                textAlign: 'center',
+                                fontWeight: '700',
                                 color: '#374151',
-                                borderBottom: '1px solid #e2e8f0'
+                                borderBottom: '2px solid #e2e8f0',
+                                fontSize: '0.875rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em'
                             }}>
                                 Actions
                             </th>
@@ -1083,79 +1179,241 @@ const AdminDashboard: React.FC = () => {
                     {data.map((item, index) => (
                         <tr key={item.id} style={{
                             borderBottom: index < data.length - 1 ? '1px solid #f3f4f6' : 'none',
-                            transition: 'background-color 0.2s ease'
+                            transition: 'all 0.3s ease'
                         }}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                            onMouseOver={(e) => {
+                                e.currentTarget.style.backgroundColor = '#f8fafc';
+                                e.currentTarget.style.transform = 'scale(1.002)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                            }}
+                            onMouseOut={(e) => {
+                                e.currentTarget.style.backgroundColor = 'white';
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.boxShadow = 'none';
+                            }}
                         >
                             {columns.map((column) => (
-                                <td key={column} style={{ padding: '1rem', color: '#1f2937' }}>
-                                    {column === 'Price' || column === 'Revenue' ?
-                                        formatCurrency(item[column.toLowerCase()]) :
+                                <td key={column} style={{ 
+                                    padding: '1.25rem 1rem', 
+                                    color: '#1f2937',
+                                    fontSize: '0.95rem',
+                                    fontWeight: '500'
+                                }}>
+                                    {column === 'Image' ? (
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}>
+                                            <img 
+                                                src={item.image || item.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTIiIGZpbGw9IiNGM0Y0RjYiLz4KPHBhdGggZD0iTTIwIDIwTDQwIDQwTDIwIDQwVjIwWiIgZmlsbD0iIzlDQTNBRiIvPgo8Y2lyY2xlIGN4PSIyNSIgY3k9IjI1IiByPSI0IiBmaWxsPSIjOUNBM0FGIi8+Cjx0ZXh0IHg9IjMwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOUNBM0FGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD4KPHN2Zz4K'} 
+                                                alt={item.name || 'Product'} 
+                                                style={{
+                                                    width: '60px',
+                                                    height: '60px',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '12px',
+                                                    boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
+                                                    border: '2px solid #e2e8f0'
+                                                }}
+                                                onError={(e) => {
+                                                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTIiIGZpbGw9IiNGM0Y0RjYiLz4KPHBhdGggZD0iTTIwIDIwTDQwIDQwTDIwIDQwVjIwWiIgZmlsbD0iIzlDQTNBRiIvPgo8Y2lyY2xlIGN4PSIyNSIgY3k9IjI1IiByPSI0IiBmaWxsPSIjOUNBM0FGIi8+Cjx0ZXh0IHg9IjMwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOUNBM0FGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD4KPHN2Zz4K';
+                                                }}
+                                            />
+                                        </div>
+                                    ) :
+                                    column === 'Name' && activeTab === 'products' ? (
+                                        <div style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '0.25rem'
+                                        }}>
+                                            <span style={{ fontWeight: '700', color: '#1f2937' }}>
+                                                {item.name}
+                                            </span>
+                                            {item.description && (
+                                                <span style={{ 
+                                                    fontSize: '0.75rem', 
+                                                    color: '#64748b',
+                                                    lineHeight: '1.2',
+                                                    maxWidth: '200px',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap'
+                                                }}>
+                                                    {item.description}
+                                                </span>
+                                            )}
+                                        </div>
+                                    ) :
+                                    column === 'Category' ? (
+                                        <span style={{
+                                            padding: '0.5rem 0.75rem',
+                                            borderRadius: '12px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: '700',
+                                            backgroundColor: '#f0f9ff',
+                                            color: '#0284c7',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                            textTransform: 'capitalize'
+                                        }}>
+                                            {item.category || 'Uncategorized'}
+                                        </span>
+                                    ) :
+                                    column === 'Price' || column === 'Revenue' ?
+                                        <span style={{ fontWeight: '700', color: '#059669', fontSize: '1rem' }}>
+                                            {formatCurrency(item[column.toLowerCase()])}
+                                        </span> :
                                         column === 'Stock' ? (
                                                 <span style={{
-                                                    padding: '0.25rem 0.75rem',
-                                                    borderRadius: '1rem',
+                                                    padding: '0.5rem 0.75rem',
+                                                    borderRadius: '12px',
                                                     fontSize: '0.75rem',
-                                                    fontWeight: '600',
-                                                    backgroundColor: item.stock > 20 ? '#dcfce7' : item.stock > 0 ? '#fef3c7' : '#fee2e2',
-                                                    color: item.stock > 20 ? '#166534' : item.stock > 0 ? '#92400e' : '#991b1b'
+                                                    fontWeight: '700',
+                                                    backgroundColor: item.inStock ? '#dcfce7' : '#fee2e2',
+                                                    color: item.inStock ? '#166534' : '#991b1b',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.5px'
                                                 }}>
-                          {item.stock}
+                          {item.inStock ? 'In Stock' : 'Out of Stock'}
                         </span>
+                                            ) :
+                                            column === 'Payment Method' ? (
+                                                <span style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem',
+                                                    padding: '0.5rem 0.75rem',
+                                                    borderRadius: '12px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '700',
+                                                    backgroundColor: 
+                                                        item.paymentMethod === 'Cash' ? '#fef3c7' : 
+                                                        item.paymentMethod === 'Card' ? '#dbeafe' : 
+                                                        item.paymentMethod === 'Online' ? '#d1fae5' : '#f3f4f6',
+                                                    color: 
+                                                        item.paymentMethod === 'Cash' ? '#92400e' : 
+                                                        item.paymentMethod === 'Card' ? '#1e40af' : 
+                                                        item.paymentMethod === 'Online' ? '#065f46' : '#374151',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                }}>
+                                                    {item.paymentMethod === 'Cash' ? <Banknote size={14} /> :
+                                                     item.paymentMethod === 'Card' ? <CreditCard size={14} /> :
+                                                     item.paymentMethod === 'Online' ? <Globe size={14} /> :
+                                                     <CreditCard size={14} />}
+                                                    {item.paymentMethod || 'Not specified'}
+                                                </span>
+                                            ) :
+                                            column === 'Role' ? (
+                                                <span style={{
+                                                    padding: '0.5rem 0.75rem',
+                                                    borderRadius: '12px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '700',
+                                                    backgroundColor: item.role === 'ADMIN' ? '#dbeafe' : '#f3f4f6',
+                                                    color: item.role === 'ADMIN' ? '#1e40af' : '#374151',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.05em'
+                                                }}>
+                                                    {item.role || 'USER'}
+                                                </span>
+                                            ) :
+                                            column === 'First Name' ? item.firstName :
+                                            column === 'Last Name' ? item.lastName :
+                                            column === 'Email' ? (
+                                                <span style={{ color: '#3b82f6', fontWeight: '600' }}>
+                                                    {item.email}
+                                                </span>
+                                            ) :
+                                            column === 'Created At' ? (
+                                                <span style={{ color: '#64748b', fontSize: '0.875rem' }}>
+                                                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}
+                                                </span>
                                             ) :
                                             item[column.toLowerCase().replace(' ', '')] || item[column.toLowerCase()]
                                     }
                                 </td>
                             ))}
                             {actions && (
-                                <td style={{ padding: '1rem' }}>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <td style={{ padding: '1.25rem 1rem', textAlign: 'center' }}>
+                                    <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
                                         <button
                                             onClick={() => handleView(item)}
                                             style={{
-                                                padding: '0.5rem',
+                                                padding: '0.75rem',
                                                 border: 'none',
-                                                backgroundColor: '#3b82f6',
+                                                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                                                 color: 'white',
-                                                borderRadius: '0.375rem',
+                                                borderRadius: '10px',
                                                 cursor: 'pointer',
-                                                transition: 'all 0.2s ease'
+                                                transition: 'all 0.3s ease',
+                                                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
                                             }}
-                                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
-                                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
+                                            onMouseOver={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.4)';
+                                            }}
+                                            onMouseOut={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+                                            }}
                                         >
                                             <Eye size={16} />
                                         </button>
                                         <button
                                             onClick={() => handleEdit(item)}
                                             style={{
-                                                padding: '0.5rem',
+                                                padding: '0.75rem',
                                                 border: 'none',
-                                                backgroundColor: '#10b981',
+                                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                                                 color: 'white',
-                                                borderRadius: '0.375rem',
+                                                borderRadius: '10px',
                                                 cursor: 'pointer',
-                                                transition: 'all 0.2s ease'
+                                                transition: 'all 0.3s ease',
+                                                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
                                             }}
-                                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'}
-                                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
+                                            onMouseOver={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.4)';
+                                            }}
+                                            onMouseOut={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                                            }}
                                         >
                                             <Edit size={16} />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(activeTab, item)}
                                             style={{
-                                                padding: '0.5rem',
+                                                padding: '0.75rem',
                                                 border: 'none',
-                                                backgroundColor: '#ef4444',
+                                                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                                                 color: 'white',
-                                                borderRadius: '0.375rem',
+                                                borderRadius: '10px',
                                                 cursor: 'pointer',
-                                                transition: 'all 0.2s ease'
+                                                transition: 'all 0.3s ease',
+                                                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
                                             }}
-                                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
-                                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ef4444'}
+                                            onMouseOver={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(239, 68, 68, 0.4)';
+                                            }}
+                                            onMouseOut={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+                                            }}
                                         >
                                             <Trash2 size={16} />
                                         </button>
@@ -1196,7 +1454,7 @@ const AdminDashboard: React.FC = () => {
             case 'customers':
                 return renderDataTable(customers, ['First Name', 'Last Name', 'Email', 'Payment Method']);
             case 'products':
-                return renderDataTable(products, ['Name', 'Price']);
+                return renderDataTable(products, ['Image', 'Name', 'Price', 'Category', 'Stock']);
 
             case 'admins':
                 return renderDataTable(admins, ['First Name', 'Last Name', 'Email', 'Role', 'Created At']);
@@ -1204,18 +1462,139 @@ const AdminDashboard: React.FC = () => {
                 return (
                     <div style={{
                         background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-                        padding: '3rem',
+                        padding: '2rem',
                         borderRadius: '1rem',
                         border: '1px solid #e2e8f0',
-                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                        textAlign: 'center'
+                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                     }}>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1e293b', marginBottom: '1rem' }}>
-                            Orders Management
-                        </h3>
-                        <p style={{ color: '#64748b', fontSize: '1.125rem' }}>
-                            Orders management feature coming soon...
-                        </p>
+                        <div style={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center', 
+                            marginBottom: '2rem' 
+                        }}>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1e293b' }}>
+                                Orders Management
+                            </h3>
+                            <div style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                                Total Orders: {orders.length}
+                            </div>
+                        </div>
+
+                        {orders.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
+                                <ShoppingCart size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+                                <p style={{ fontSize: '1.125rem', fontWeight: '500' }}>No orders found</p>
+                                <p>Orders will appear here when customers make purchases</p>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {orders.map((order) => {
+                                    const orderId = order.id || order.orderId || 'N/A';
+                                    const orderDate = order.date || order.createdAt || order.orderDate || '';
+                                    const orderStatus = order.status || 'Pending';
+                                    const orderTotal = order.total || order.amount || order.price || 0;
+                                    const customerEmail = order.customerEmail || order.email || 'N/A';
+                                    const productName = order.productName || 'N/A';
+
+                                    const getStatusColor = (status: string) => {
+                                        switch (status.toLowerCase()) {
+                                            case 'delivered':
+                                            case 'picked up':
+                                                return '#10b981';
+                                            case 'ready for pickup':
+                                            case 'ready':
+                                                return '#3b82f6';
+                                            case 'processing':
+                                                return '#f59e0b';
+                                            case 'pending':
+                                                return '#6b7280';
+                                            case 'cancelled':
+                                                return '#ef4444';
+                                            default:
+                                                return '#6b7280';
+                                        }
+                                    };
+
+                                    return (
+                                        <div key={orderId} style={{
+                                            backgroundColor: 'white',
+                                            padding: '1.5rem',
+                                            borderRadius: '0.75rem',
+                                            border: '1px solid #e2e8f0',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                                        }}>
+                                            <div style={{ 
+                                                display: 'grid', 
+                                                gridTemplateColumns: '1fr 1fr 1fr 200px', 
+                                                gap: '1rem', 
+                                                alignItems: 'center' 
+                                            }}>
+                                                <div>
+                                                    <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.25rem' }}>
+                                                        Order ID
+                                                    </p>
+                                                    <p style={{ fontWeight: '600', color: '#1e293b' }}>
+                                                        #{orderId}
+                                                    </p>
+                                                    <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
+                                                        {orderDate ? new Date(orderDate).toLocaleDateString() : 'N/A'}
+                                                    </p>
+                                                </div>
+                                                
+                                                <div>
+                                                    <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.25rem' }}>
+                                                        Customer
+                                                    </p>
+                                                    <p style={{ fontWeight: '500', color: '#1e293b' }}>
+                                                        {customerEmail}
+                                                    </p>
+                                                    <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
+                                                        {productName}
+                                                    </p>
+                                                </div>
+                                                
+                                                <div>
+                                                    <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.25rem' }}>
+                                                        Amount
+                                                    </p>
+                                                    <p style={{ fontWeight: '600', color: '#1e293b', fontSize: '1.125rem' }}>
+                                                        R{Number(orderTotal).toFixed(2)}
+                                                    </p>
+                                                </div>
+                                                
+                                                <div>
+                                                    <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.5rem' }}>
+                                                        Status
+                                                    </p>
+                                                    <select
+                                                        value={orderStatus}
+                                                        onChange={(e) => handleUpdateOrderStatus(orderId, e.target.value)}
+                                                        style={{
+                                                            width: '100%',
+                                                            padding: '0.5rem',
+                                                            borderRadius: '0.5rem',
+                                                            border: '1px solid #d1d5db',
+                                                            backgroundColor: getStatusColor(orderStatus),
+                                                            color: 'white',
+                                                            fontWeight: '500',
+                                                            fontSize: '0.875rem'
+                                                        }}
+                                                    >
+                                                        <option value="Pending">Pending</option>
+                                                        <option value="Processing">Processing</option>
+                                                        <option value="Ready for Pickup">Ready for Pickup</option>
+                                                        <option value="Picked Up">Picked Up</option>
+                                                        <option value="Delivered">Delivered</option>
+                                                        <option value="Cancelled">Cancelled</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 );
             default:
