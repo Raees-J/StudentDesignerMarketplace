@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getAllProducts } from '../api/productService'
 import ProductCard from '../components/ProductCard'
-import { categories, Product } from '../data/products'
+import { categories, Product, products as staticProducts } from '../data/products'
 
 const Products: React.FC = () => {
   const { category } = useParams()
@@ -24,7 +24,8 @@ const Products: React.FC = () => {
         const data = await getAllProducts()
         setProducts(data)
       } catch (err) {
-        setProducts([])
+        console.warn('Backend not available, falling back to static data:', err)
+        setProducts(staticProducts)
       } finally {
         setLoading(false)
       }

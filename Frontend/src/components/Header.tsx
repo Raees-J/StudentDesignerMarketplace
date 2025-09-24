@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 
 const Header: React.FC = () => {
-  const { currentUser, logout } = useAuth()
+  const { currentUser, logout, role } = useAuth()
   const { itemCount } = useCart()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -30,8 +30,8 @@ const Header: React.FC = () => {
 
   return (
       <header style={{
-        backgroundColor: '#ffffff',
-        borderBottom: '2px solid #e5e7eb',
+        backgroundColor: '#06A3D6', // CPUT blue
+        borderBottom: '2px solid #0096C7',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)'
       }}>
         <div className="container">
@@ -45,41 +45,13 @@ const Header: React.FC = () => {
             {/* Logo */}
             <Link to="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{
-                  width: '3rem',
-                  height: '3rem',
-                  backgroundColor: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-                  background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-                  borderRadius: '0.75rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontWeight: '900',
-                  fontSize: '1rem',
-                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
-                }}>
-                  SDM
-                </div>
-                <div>
-                  <h1 style={{
-                    fontSize: '1.5rem',
-                    fontWeight: '800',
-                    color: '#1f2937',
-                    margin: 0,
-                    letterSpacing: '-0.025em'
-                  }}>
-                    Designer Market
-                  </h1>
-                  <p style={{
-                    fontSize: '0.75rem',
-                    color: '#6b7280',
-                    margin: 0,
-                    fontWeight: '500'
-                  }}>
-                    University Design Department
-                  </p>
-                </div>
+                <img
+                  src="https://www.cput.ac.za/images/cput-logo-white.svg"
+                  alt="CPUT"
+                  width={240}
+                  height={120}
+                  style={{ background: 'transparent', display: 'block', maxHeight: 120, maxWidth: 320 }}
+                />
               </div>
             </Link>
 
@@ -160,6 +132,27 @@ const Header: React.FC = () => {
                       }}>
                   About
                 </Link>
+                {/* Admin Panel Link - Only show for admin users */}
+                {(role === 'admin' || role === 'superadmin') && (
+                    <Link to="/admin/dashboard" style={{
+                      textDecoration: 'none',
+                      color: '#374151',
+                      fontWeight: '600',
+                      fontSize: '0.95rem',
+                      padding: '0.5rem 0',
+                      borderBottom: '2px solid transparent',
+                      transition: 'all 0.2s ease'
+                    }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.color = '#3b82f6'
+                            e.currentTarget.style.borderBottomColor = '#3b82f6'
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.color = '#374151'
+                            e.currentTarget.style.borderBottomColor = 'transparent'
+                          }}>
+                      Admin Panel</Link>
+                )}
 
               </div>
             </nav>
@@ -331,6 +324,31 @@ const Header: React.FC = () => {
                           marginTop: '0.5rem',
                           overflow: 'hidden'
                         }}>
+                          {/* Admin Dashboard Link - Only show for admin users */}
+                          {(role === 'admin' || role === 'superadmin') && (
+                              <Link
+                                  to="/admin/dashboard"
+                                  onClick={() => setIsMenuOpen(false)}
+                                  style={{
+                                    display: 'block',
+                                    padding: '1rem 1.25rem',
+                                    textDecoration: 'none',
+                                    color: '#3b82f6',
+                                    fontSize: '0.9rem',
+                                    fontWeight: '600',
+                                    borderBottom: '1px solid #f3f4f6',
+                                    transition: 'background-color 0.2s ease'
+                                  }}
+                                  onMouseOver={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#f0f9ff'
+                                  }}
+                                  onMouseOut={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent'
+                                  }}
+                              >
+                                Admin Dashboard
+                              </Link>
+                          )}
                           <Link
                               to="/profile"
                               onClick={() => setIsMenuOpen(false)}

@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, ShoppingCart, Heart, Share2, Star, Truck, Shield, RotateCcw } from 'lucide-react'
-import { products } from '../data/products'
-import { useCart } from '../contexts/CartContext'
+import { ArrowLeft, Heart, RotateCcw, Share2, Shield, ShoppingCart, Star, Truck } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { Link, useParams } from 'react-router-dom'
+import { getAllProducts } from '../api/productService'
+import { useCart } from '../contexts/CartContext'
+import { products } from '../data/products'
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams()
@@ -12,8 +13,33 @@ const ProductDetail: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState('description')
+  const [allProducts, setAllProducts] = useState(products) // Start with static data
+  const [loading, setLoading] = useState(true)
 
-  const product = products.find(p => p.id === id)
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getAllProducts()
+        setAllProducts(data)
+      } catch (err) {
+        console.warn('Backend not available, using static data:', err)
+        // Keep static data as fallback
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProducts()
+  }, [])
+
+  const product = allProducts.find(p => p.id === id)
+
+  if (loading) {
+    return (
+        <div style={{ padding: '4rem 0', textAlign: 'center' }}>
+          <p>Loading product...</p>
+        </div>
+    )
+  }
 
   if (!product) {
     return (
