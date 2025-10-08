@@ -133,7 +133,7 @@ const Header: React.FC = () => {
                   About
                 </Link>
                 {/* Admin Panel Link - Only show for admin users */}
-                {(role === 'admin' || role === 'superadmin') && (
+                {role === 'admin' && (
                     <Link to="/admin/dashboard" style={{
                       textDecoration: 'none',
                       color: '#374151',
@@ -325,7 +325,7 @@ const Header: React.FC = () => {
                           overflow: 'hidden'
                         }}>
                           {/* Admin Dashboard Link - Only show for admin users */}
-                          {(role === 'admin' || role === 'superadmin') && (
+                          {role === 'admin' && (
                               <Link
                                   to="/admin/dashboard"
                                   onClick={() => setIsMenuOpen(false)}

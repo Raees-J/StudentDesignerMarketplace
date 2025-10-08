@@ -23,7 +23,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     })
   }
 
-  // Modal for image view
+  // Modal for image and description view
   const ImageModal = () => (
     <div style={{
       position: 'fixed',
@@ -31,34 +31,110 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       left: 0,
       width: '100vw',
       height: '100vh',
-      background: 'rgba(0,0,0,0.7)',
+      background: 'rgba(0,0,0,0.8)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 1000
+      zIndex: 1000,
+      padding: '2rem'
     }} onClick={() => setShowModal(false)}>
-      <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }} onClick={e => e.stopPropagation()}>
-        <img src={product.image} alt={product.name} style={{
-          maxWidth: '80vw',
-          maxHeight: '80vh',
-          borderRadius: '1.2rem',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.25)'
-        }} />
+      <div style={{ 
+        position: 'relative', 
+        maxWidth: '90vw', 
+        maxHeight: '90vh',
+        background: 'white',
+        borderRadius: '1.5rem',
+        overflow: 'hidden',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+        display: 'flex',
+        flexDirection: window.innerWidth > 768 ? 'row' : 'column'
+      }} onClick={e => e.stopPropagation()}>
+        
+        {/* Image Section */}
+        <div style={{ 
+          flex: window.innerWidth > 768 ? '1' : 'none',
+          minHeight: window.innerWidth > 768 ? '500px' : '300px',
+          position: 'relative'
+        }}>
+          <img src={product.image} alt={product.name} style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover'
+          }} />
+        </div>
+        
+        {/* Content Section */}
+        <div style={{
+          flex: window.innerWidth > 768 ? '1' : 'none',
+          padding: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          maxHeight: window.innerWidth > 768 ? '500px' : '400px',
+          overflowY: 'auto'
+        }}>
+          <div style={{
+            display: 'inline-block',
+            backgroundColor: '#e0e7ef',
+            color: '#2563eb',
+            padding: '0.4rem 1rem',
+            borderRadius: '0.6rem',
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            textTransform: 'capitalize',
+            marginBottom: '1rem',
+            alignSelf: 'flex-start'
+          }}>
+            {product.category}
+          </div>
+          
+          <h2 style={{
+            fontSize: '1.8rem',
+            fontWeight: 700,
+            color: '#1e293b',
+            marginBottom: '1rem',
+            lineHeight: 1.3
+          }}>
+            {product.name}
+          </h2>
+          
+          <p style={{
+            color: '#64748b',
+            fontSize: '1.1rem',
+            lineHeight: 1.6,
+            marginBottom: '1.5rem',
+            whiteSpace: 'pre-line'
+          }}>
+            {product.description}
+          </p>
+          
+          <div style={{
+            fontSize: '2rem',
+            fontWeight: 700,
+            color: '#10b981',
+            marginTop: 'auto'
+          }}>
+            R{product.price.toFixed(2)}
+          </div>
+        </div>
+        
+        {/* Close Button */}
         <button onClick={() => setShowModal(false)} style={{
           position: 'absolute',
-          top: 10,
-          right: 10,
-          background: 'rgba(255,255,255,0.85)',
+          top: 15,
+          right: 15,
+          background: 'rgba(255,255,255,0.9)',
           border: 'none',
           borderRadius: '50%',
-          width: 36,
-          height: 36,
+          width: 40,
+          height: 40,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.10)'
-        }}><X size={22} color="#334155" /></button>
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 10
+        }}><X size={24} color="#334155" /></button>
       </div>
     </div>
   )
@@ -187,10 +263,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             lineHeight: 1.55,
             marginBottom: '1.05rem',
             display: '-webkit-box',
-            WebkitLineClamp: 2,
+            WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
-            minHeight: '2.5em',
+            minHeight: '3.7em',
           }}>
             {product.description}
           </p>

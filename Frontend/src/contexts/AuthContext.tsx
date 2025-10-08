@@ -8,12 +8,12 @@ export interface User {
   name: string;
   firstName?: string;
   lastName?: string;
-  role: 'admin' | 'user' | 'superadmin';
+  role: 'admin' | 'user';
 }
 
 interface AuthContextType {
   currentUser: User | null;
-  role: 'admin' | 'user' | 'superadmin' | null;
+  role: 'admin' | 'user' | null;
   loading: boolean;
   login: (email: string, password: string, loginRole?: 'admin' | 'user') => Promise<boolean>;
   logout: () => void;
@@ -30,7 +30,7 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [role, setRole] = useState<'admin' | 'user' | 'superadmin' | null>(null);
+  const [role, setRole] = useState<'admin' | 'user' | null>(null);
   const [loading, setLoading] = useState(false);
 
   
@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const user = JSON.parse(savedUser);
         setCurrentUser(user);
-        setRole(savedRole as 'admin' | 'user' | 'superadmin');
+        setRole(savedRole as 'admin' | 'user');
       } catch (error) {
         console.error('Failed to parse saved user data:', error);
         localStorage.removeItem('currentUser');
@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   setLoading(true);
   try {
     let response;
-    let detectedRole: 'admin' | 'user' | 'superadmin' = 'user';
+    let detectedRole: 'admin' | 'user' = 'user';
 
     // Try logging in as admin first
     try {
