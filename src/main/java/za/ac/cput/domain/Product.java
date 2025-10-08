@@ -14,6 +14,7 @@ public class Product {
     @Id
     private String productID;
     private String name;
+    @Lob
     private String description;
     private double price;
     @Lob
