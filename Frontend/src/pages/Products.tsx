@@ -252,14 +252,18 @@ const Products: React.FC = () => {
           {/* Products Grid/List */}
           {filteredProducts.length > 0 ? (
               <div
-                className={viewMode === 'grid' ? 'product-card-grid grid md:grid-cols-3' : 'product-card-grid grid grid-cols-1'}
+                className="product-card-grid"
                 style={{
+                  display: 'grid',
+                  gridTemplateColumns: viewMode === 'grid' ? 'repeat(auto-fit, minmax(340px, 1fr))' : '1fr',
                   gap: '2.5rem',
                   justifyContent: 'center',
                   alignItems: 'stretch',
                   margin: '0 auto',
                   paddingBottom: '2rem',
                   minHeight: 400,
+                  width: '100%',
+                  maxWidth: '1400px',
                 }}
               >
                 {filteredProducts.map((product) => (

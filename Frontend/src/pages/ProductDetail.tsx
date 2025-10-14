@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Link, useParams } from 'react-router-dom'
 import { getAllProducts } from '../api/productService'
+import { getProductReviews, Review } from '../api/reviewService'
+import ReviewSection from '../components/ReviewSection'
 import { useCart } from '../contexts/CartContext'
 import { products } from '../data/products'
 
@@ -15,6 +17,8 @@ const ProductDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState('description')
   const [allProducts, setAllProducts] = useState(products) // Start with static data
   const [loading, setLoading] = useState(true)
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -31,7 +35,31 @@ const ProductDetail: React.FC = () => {
     fetchProducts()
   }, [])
 
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!id) return
+      
+      try {
+        setReviewsLoading(true)
+        const reviewData = await getProductReviews(id)
+        setReviews(reviewData)
+      } catch (err) {
+        console.warn('Could not fetch reviews:', err)
+        setReviews([])
+      } finally {
+        setReviewsLoading(false)
+      }
+    }
+    
+    fetchReviews()
+  }, [id])
+
   const product = allProducts.find(p => p.id === id)
+
+  // Calculate average rating from reviews
+  const averageRating = reviews.length > 0 
+    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
+    : 0
 
   if (loading) {
     return (
@@ -72,7 +100,6 @@ const ProductDetail: React.FC = () => {
       name: product.name,
       price: product.price,
       image: product.image,
-      quantity,
       size: selectedSize,
       color: selectedColor
     })
@@ -157,9 +184,9 @@ const ProductDetail: React.FC = () => {
               </h1>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  {renderStars(product.rating)}
+                  {renderStars(averageRating)}
                   <span style={{ marginLeft: '0.5rem', color: '#6b7280', fontSize: '0.875rem' }}>
-                  ({product.rating}) • 127 reviews
+                  ({averageRating.toFixed(1)}) • {reviews.length} reviews
                 </span>
                 </div>
               </div>
@@ -384,30 +411,7 @@ const ProductDetail: React.FC = () => {
             )}
 
             {activeTab === 'reviews' && (
-                <div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>
-                    Customer Reviews
-                  </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    {[
-                      { name: 'Sarah M.', rating: 5, comment: 'Excellent quality and fast shipping. Love the design!' },
-                      { name: 'John D.', rating: 4, comment: 'Great product, fits perfectly. Would recommend.' },
-                      { name: 'Lisa K.', rating: 5, comment: 'Amazing quality for the price. Very satisfied with my purchase.' }
-                    ].map((review, index) => (
-                        <div key={index} style={{ padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '0.5rem' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
-                            <h4 style={{ fontWeight: '600' }}>{review.name}</h4>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                              {renderStars(review.rating)}
-                            </div>
-                          </div>
-                          <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                            {review.comment}
-                          </p>
-                        </div>
-                    ))}
-                  </div>
-                </div>
+                <ReviewSection productId={product.id} />
             )}
           </div>
         </div>

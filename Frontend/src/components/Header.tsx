@@ -405,22 +405,24 @@ const Header: React.FC = () => {
                     <Link to="/login" style={{
                       textDecoration: 'none',
                       padding: '0.6rem 1.5rem',
-                      border: '2px solid #3b82f6',
+                      background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
                       borderRadius: '50px',
-                      color: '#3b82f6',
+                      color: 'white',
                       fontSize: '0.9rem',
                       fontWeight: '600',
+                      border: 'none',
+                      boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
                       transition: 'all 0.2s ease',
                       display: 'inline-flex',
                       alignItems: 'center'
                     }}
                           onMouseOver={(e) => {
-                            e.currentTarget.style.backgroundColor = '#3b82f6'
-                            e.currentTarget.style.color = 'white'
+                            e.currentTarget.style.transform = 'translateY(-2px)'
+                            e.currentTarget.style.boxShadow = '0 6px 16px rgba(139, 92, 246, 0.4)'
                           }}
                           onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = 'transparent'
-                            e.currentTarget.style.color = '#3b82f6'
+                            e.currentTarget.style.transform = 'translateY(0)'
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.3)'
                           }}>
                       Login
                     </Link>
