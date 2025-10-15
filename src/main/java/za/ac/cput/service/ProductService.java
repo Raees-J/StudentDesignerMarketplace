@@ -27,6 +27,10 @@ public class ProductService implements IProductService {
                 .setPrice(product.getPrice())
                 .setImageUrl(product.getImageUrl())
                 .setCategory(product.getCategory())
+                .setInStock(product.isInStock())
+                .setSizes(product.getSizes())
+                .setColors(product.getColors())
+                .setFeatures(product.getFeatures())
                 .build();
         return repository.save(newProduct);
     }
@@ -46,6 +50,10 @@ public class ProductService implements IProductService {
                     .setPrice(product.getPrice())
                     .setImageUrl(product.getImageUrl())
                     .setCategory(product.getCategory())
+                    .setInStock(product.isInStock())
+                    .setSizes(product.getSizes())
+                    .setColors(product.getColors())
+                    .setFeatures(product.getFeatures())
                     .build();
             return repository.save(updated);
         }

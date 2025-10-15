@@ -766,7 +766,11 @@ const AdminDashboard: React.FC = () => {
             description: '',
             price: 0,
             image: '',
-            category: categories[0].id
+            category: categories[0].id,
+            inStock: true,
+            sizes: [],
+            colors: [],
+            features: []
         });
 
         const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -808,6 +812,8 @@ const AdminDashboard: React.FC = () => {
                 boxShadow: '0 6px 24px rgba(30,41,59,0.10)',
                 maxWidth: 1100,
                 margin: '0 auto',
+                maxHeight: '90vh',
+                overflowY: 'auto'
             }}>
                 <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '2.5rem', color: '#1e293b', letterSpacing: '-0.01em' }}>
                     {viewMode === 'create' ? 'Add New Product' : 'Edit Product'}
@@ -864,6 +870,33 @@ const AdminDashboard: React.FC = () => {
                                     ))}
                                 </select>
                             </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '1rem', fontWeight: '700', color: '#374151', marginBottom: '0.75rem' }}>
+                                    Stock Status
+                                </label>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem', fontWeight: '500', cursor: 'pointer' }}>
+                                        <input 
+                                            type="radio" 
+                                            name="stockStatus"
+                                            checked={formData.inStock === true} 
+                                            onChange={() => setFormData({ ...formData, inStock: true })} 
+                                            style={{ width: '1.1rem', height: '1.1rem' }}
+                                        />
+                                        <span style={{ color: '#10b981' }}>In Stock</span>
+                                    </label>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem', fontWeight: '500', cursor: 'pointer' }}>
+                                        <input 
+                                            type="radio" 
+                                            name="stockStatus"
+                                            checked={formData.inStock === false} 
+                                            onChange={() => setFormData({ ...formData, inStock: false })} 
+                                            style={{ width: '1.1rem', height: '1.1rem' }}
+                                        />
+                                        <span style={{ color: '#ef4444' }}>Out of Stock</span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         <div>
                             <label style={{ display: 'block', fontSize: '1rem', fontWeight: '700', color: '#374151', marginBottom: '0.75rem' }}>
@@ -872,6 +905,56 @@ const AdminDashboard: React.FC = () => {
                             <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={8} style={{ width: '100%', padding: '1rem', border: '1.5px solid #e2e8f0', borderRadius: '0.7rem', fontSize: '1.1rem', fontWeight: 500, background: '#f8fafc', resize: 'vertical', minHeight: '8rem' }} required />
                         </div>
                     </div>
+                    
+                    {/* Additional Product Options */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', marginTop: '2rem' }}>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '1rem', fontWeight: '700', color: '#374151', marginBottom: '0.75rem' }}>
+                                Available Sizes (comma-separated)
+                            </label>
+                            <input 
+                                type="text" 
+                                value={formData.sizes?.join(', ') || ''} 
+                                onChange={(e) => setFormData({ 
+                                    ...formData, 
+                                    sizes: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
+                                })} 
+                                placeholder="S, M, L, XL, XXL"
+                                style={{ width: '100%', padding: '1rem', border: '1.5px solid #e2e8f0', borderRadius: '0.7rem', fontSize: '1rem', fontWeight: 500, background: '#f8fafc' }} 
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '1rem', fontWeight: '700', color: '#374151', marginBottom: '0.75rem' }}>
+                                Available Colors (comma-separated)
+                            </label>
+                            <input 
+                                type="text" 
+                                value={formData.colors?.join(', ') || ''} 
+                                onChange={(e) => setFormData({ 
+                                    ...formData, 
+                                    colors: e.target.value.split(',').map(c => c.trim()).filter(c => c) 
+                                })} 
+                                placeholder="Black, White, Red, Blue"
+                                style={{ width: '100%', padding: '1rem', border: '1.5px solid #e2e8f0', borderRadius: '0.7rem', fontSize: '1rem', fontWeight: 500, background: '#f8fafc' }} 
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '1rem', fontWeight: '700', color: '#374151', marginBottom: '0.75rem' }}>
+                                Key Features (comma-separated)
+                            </label>
+                            <input 
+                                type="text" 
+                                value={formData.features?.join(', ') || ''} 
+                                onChange={(e) => setFormData({ 
+                                    ...formData, 
+                                    features: e.target.value.split(',').map(f => f.trim()).filter(f => f) 
+                                })} 
+                                placeholder="Durable, Waterproof, Lightweight"
+                                style={{ width: '100%', padding: '1rem', border: '1.5px solid #e2e8f0', borderRadius: '0.7rem', fontSize: '1rem', fontWeight: 500, background: '#f8fafc' }} 
+                            />
+                        </div>
+                    </div>
+                    
                     <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'flex-end', marginTop: '2.5rem' }}>
                         <button type="button" onClick={handleBackToList} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.9rem 2.2rem', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '0.7rem', fontWeight: '700', fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(71,85,105,0.10)' }}>
                             <X size={18} />
