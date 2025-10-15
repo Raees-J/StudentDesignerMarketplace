@@ -6,11 +6,14 @@ import toast from 'react-hot-toast';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { register, loading } = useAuth();
   const navigate = useNavigate();
@@ -18,7 +21,8 @@ const Register: React.FC = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formData.name) newErrors.name = 'Full name is required';
+    if (!formData.firstName) newErrors.firstName = 'First name is required';
+    if (!formData.lastName) newErrors.lastName = 'Last name is required';
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -28,6 +32,11 @@ const Register: React.FC = () => {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
+    }
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
     }
 
     setErrors(newErrors);
@@ -50,7 +59,8 @@ const Register: React.FC = () => {
     if (!validateForm()) return;
 
     try {
-      const success = await register(formData.name, formData.email, formData.password);
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      const success = await register(fullName, formData.email, formData.password);
       if (success) {
         navigate('/'); // redirect after registration
       }
@@ -92,7 +102,7 @@ const Register: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit} style={{ marginBottom: '1.5rem' }}>
-          {/* Full Name */}
+          {/* First Name */}
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{
               display: 'block',
@@ -100,7 +110,7 @@ const Register: React.FC = () => {
               fontWeight: 600,
               color: '#374151'
             }}>
-              Full Name
+              First Name
             </label>
             <div style={{ position: 'relative' }}>
               <User size={18} style={{
@@ -112,23 +122,64 @@ const Register: React.FC = () => {
               }} />
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="firstName"
+                value={formData.firstName}
                 onChange={handleInputChange}
-                placeholder="Enter your full name"
+                placeholder="Enter your first name"
                 style={{
                   width: '100%',
                   padding: '0.75rem 0.75rem 0.75rem 2.5rem',
                   borderRadius: '0.5rem',
-                  border: `1px solid ${errors.name ? '#ef4444' : '#d1d5db'}`,
+                  border: `1px solid ${errors.firstName ? '#ef4444' : '#d1d5db'}`,
                   outline: 'none',
                   fontSize: '0.95rem'
                 }}
               />
             </div>
-            {errors.name && (
+            {errors.firstName && (
               <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem' }}>
-                {errors.name}
+                {errors.firstName}
+              </p>
+            )}
+          </div>
+
+          {/* Last Name */}
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.4rem',
+              fontWeight: 600,
+              color: '#374151'
+            }}>
+              Last Name
+            </label>
+            <div style={{ position: 'relative' }}>
+              <User size={18} style={{
+                position: 'absolute',
+                left: '0.9rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#9ca3af'
+              }} />
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                placeholder="Enter your last name"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 0.75rem 0.75rem 2.5rem',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${errors.lastName ? '#ef4444' : '#d1d5db'}`,
+                  outline: 'none',
+                  fontSize: '0.95rem'
+                }}
+              />
+            </div>
+            {errors.lastName && (
+              <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                {errors.lastName}
               </p>
             )}
           </div>
@@ -227,6 +278,63 @@ const Register: React.FC = () => {
             {errors.password && (
               <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem' }}>
                 {errors.password}
+              </p>
+            )}
+          </div>
+
+          {/* Confirm Password */}
+          <div style={{ marginBottom: '1.75rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.4rem',
+              fontWeight: 600,
+              color: '#374151'
+            }}>
+              Confirm Password
+            </label>
+            <div style={{ position: 'relative' }}>
+              <Lock size={18} style={{
+                position: 'absolute',
+                left: '0.9rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#9ca3af'
+              }} />
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                placeholder="Confirm your password"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 2.5rem 0.75rem 2.5rem',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${errors.confirmPassword ? '#ef4444' : '#d1d5db'}`,
+                  outline: 'none',
+                  fontSize: '0.95rem'
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '0.9rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#9ca3af'
+                }}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            {errors.confirmPassword && (
+              <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                {errors.confirmPassword}
               </p>
             )}
           </div>
