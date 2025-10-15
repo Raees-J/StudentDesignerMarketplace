@@ -18,12 +18,6 @@ const Checkout: React.FC = () => {
     email: currentUser?.email || '',
     phone: '',
 
-    // Shipping Address
-    address: '',
-    city: '',
-    province: '',
-    postalCode: '',
-
     // Payment Information
     cardNumber: '',
     expiryDate: '',
@@ -68,9 +62,8 @@ const Checkout: React.FC = () => {
   }
 
   const subtotal = total
-  const shipping = total > 500 ? 0 : 50
   const tax = total * 0.15
-  const finalTotal = subtotal + shipping + tax
+  const finalTotal = subtotal + tax
 
   return (
       <div className="container" style={{ padding: '2rem 0' }}>
@@ -79,7 +72,7 @@ const Checkout: React.FC = () => {
             Checkout
           </h1>
           <p style={{ color: '#6b7280' }}>
-            Complete your order
+            Complete your order - items will be collected at the Design Department building
           </p>
         </div>
 
@@ -152,78 +145,25 @@ const Checkout: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Shipping Address */}
+                {/* Collection Information */}
                 <div className="card" style={{ padding: '2rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
                     <span style={{ color: '#3b82f6', fontSize: '1.2rem' }}>📍</span>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Shipping Address</h3>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Collection Information</h3>
                   </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                        Street Address *
-                      </label>
-                      <input
-                          type="text"
-                          name="address"
-                          value={formData.address}
-                          onChange={handleInputChange}
-                          className="input"
-                          required
-                      />
-                    </div>
-                    <div className="grid md:grid-cols-3" style={{ gap: '1rem' }}>
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                          City *
-                        </label>
-                        <input
-                            type="text"
-                            name="city"
-                            value={formData.city}
-                            onChange={handleInputChange}
-                            className="input"
-                            required
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                          Province *
-                        </label>
-                        <select
-                            name="province"
-                            value={formData.province}
-                            onChange={handleInputChange}
-                            className="input"
-                            required
-                        >
-                          <option value="">Select Province</option>
-                          <option value="EC">Eastern Cape</option>
-                          <option value="FS">Free State</option>
-                          <option value="GP">Gauteng</option>
-                          <option value="KZN">KwaZulu-Natal</option>
-                          <option value="LP">Limpopo</option>
-                          <option value="MP">Mpumalanga</option>
-                          <option value="NC">Northern Cape</option>
-                          <option value="NW">North West</option>
-                          <option value="WC">Western Cape</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                          Postal Code *
-                        </label>
-                        <input
-                            type="text"
-                            name="postalCode"
-                            value={formData.postalCode}
-                            onChange={handleInputChange}
-                            className="input"
-                            required
-                        />
-                      </div>
-                    </div>
+                  
+                  <div style={{ 
+                    padding: '1rem', 
+                    backgroundColor: '#f3f4f6', 
+                    borderRadius: '0.5rem',
+                    border: '1px solid #d1d5db'
+                  }}>
+                    <p style={{ margin: 0, fontWeight: '500', color: '#374151' }}>
+                      📦 Items will be collected at the administration office in the Design Department building.
+                    </p>
+                    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.875rem', color: '#6b7280' }}>
+                      You will receive a confirmation email with collection details once your order is processed.
+                    </p>
                   </div>
                 </div>
 
@@ -335,10 +275,6 @@ const Checkout: React.FC = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span>Subtotal</span>
                     <span>R{subtotal.toFixed(2)}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Shipping</span>
-                    <span>R{shipping.toFixed(2)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span>Tax (15%)</span>

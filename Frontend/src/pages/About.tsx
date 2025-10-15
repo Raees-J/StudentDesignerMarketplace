@@ -7,25 +7,39 @@ import React from 'react';
 
 const initialTeam = [
   {
-    name: 'Sarah Johnson',
-    role: 'Store Manager',
-    desc: 'With over 8 years of experience in retail management, Sarah ensures our store operates smoothly and efficiently.',
+    name: 'Alex Thompson',
+    role: 'Lead Frontend Developer',
+    desc: 'Specializes in React, TypeScript, and modern web frameworks. Alex leads our frontend team in creating exceptional user experiences.',
+    image: '',
+    sample: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg',
+  },
+  {
+    name: 'Maya Patel',
+    role: 'UI/UX Designer',
+    desc: 'Creative designer with expertise in user interface design and user experience optimization. Maya ensures our websites are both beautiful and functional.',
     image: '',
     sample: 'https://images.pexels.com/photos/1438081/pexels-photo-1438081.jpeg',
   },
   {
-    name: 'Michael Chen',
-    role: 'Marketing Coordinator',
-    desc: `Michael handles our promotional campaigns and ensures our products align with the university's brand guidelines.`,
+    name: 'David Chen',
+    role: 'Backend Developer',
+    desc: 'Expert in Node.js, databases, and server architecture. David builds robust and scalable backend systems that power our web applications.',
     image: '',
     sample: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg',
   },
   {
-    name: 'Emily Rodriguez',
-    role: 'Customer Service Lead',
-    desc: 'Emily leads our customer service team, ensuring every customer has a positive experience with our store.',
+    name: 'Sarah Williams',
+    role: 'Full Stack Developer',
+    desc: 'Versatile developer proficient in both frontend and backend technologies. Sarah bridges the gap between design and functionality.',
     image: '',
     sample: 'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg',
+  },
+  {
+    name: 'Marcus Johnson',
+    role: 'DevOps Engineer',
+    desc: 'Manages our deployment pipelines, cloud infrastructure, and ensures our websites run smoothly and securely in production.',
+    image: '',
+    sample: 'https://images.pexels.com/photos/1484794/pexels-photo-1484794.jpeg',
   },
 ];
 
@@ -35,45 +49,28 @@ const About: React.FC = () => {
 
   return (
     <div className="container" style={{ padding: '2rem 0' }}>
-      {/* Hero Section */}
-      <section style={{ textAlign: 'center', marginBottom: '4rem' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: '700', color: '#1f2937', marginBottom: '1rem' }}>
-          About University Store
-        </h1>
-        <p style={{ fontSize: '1.25rem', color: '#6b7280', maxWidth: '800px', margin: '0 auto', lineHeight: 1.6 }}>
-          We are the official merchandise store for the University Marketing Department of CPUT,
-          providing high-quality products that represent our institution with pride and excellence.
-        </p>
-      </section>
-
-      {/* Mission Section */}
+      {/* Hero and Mission Section */}
       <section style={{ marginBottom: '4rem' }}>
-        <div className="grid lg:grid-cols-2" style={{ gap: '3rem', alignItems: 'center' }}>
-          <div>
-            <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '1.5rem', color: '#1f2937' }}>
-              Our Mission
-            </h2>
-            <p style={{ fontSize: '1.125rem', color: '#6b7280', marginBottom: '1.5rem', lineHeight: 1.6 }}>
-              To provide the university community and supporters with premium merchandise
-              that reflects our values of excellence, innovation, and tradition.
-            </p>
-            <p style={{ fontSize: '1.125rem', color: '#6b7280', lineHeight: 1.6 }}>
-              From comfortable study furniture to branded apparel and promotional items,
-              we ensure every product meets the highest standards of quality and design.
-            </p>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <img
-              src="https://images.pexels.com/photos/1438081/pexels-photo-1438081.jpeg"
-              alt="University Campus"
-              style={{
-                width: '100%',
-                maxWidth: '500px',
-                borderRadius: '1rem',
-                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
-              }}
-            />
-          </div>
+        <div className="card" style={{ padding: '3rem', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: '700', color: '#1f2937', marginBottom: '1rem' }}>
+            About University Store
+          </h1>
+          <p style={{ fontSize: '1.25rem', color: '#6b7280', marginBottom: '2.5rem', lineHeight: 1.6 }}>
+            We are the official merchandise store for the University Marketing Department of CPUT,
+            providing high-quality products that represent our institution with pride and excellence.
+          </p>
+          
+          <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '1.5rem', color: '#1f2937' }}>
+            Our Mission
+          </h2>
+          <p style={{ fontSize: '1.125rem', color: '#6b7280', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+            To provide the university community and supporters with premium merchandise
+            that reflects our values of excellence, innovation, and tradition.
+          </p>
+          <p style={{ fontSize: '1.125rem', color: '#6b7280', lineHeight: 1.6 }}>
+            From comfortable study furniture to branded apparel and promotional items,
+            we ensure every product meets the highest standards of quality and design.
+          </p>
         </div>
       </section>
 
@@ -181,36 +178,24 @@ const About: React.FC = () => {
 
       {/* History Section */}
       <section style={{ marginBottom: '4rem' }}>
-        <div className="grid lg:grid-cols-2" style={{ gap: '3rem', alignItems: 'center' }}>
-          <div style={{ textAlign: 'center' }}>
-            <img
-              src="https://images.pexels.com/photos/5940721/pexels-photo-5940721.jpeg"
-              alt="University History"
-              style={{
-                width: '100%',
-                maxWidth: '500px',
-                borderRadius: '1rem',
-                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
-              }}
-            />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '1.5rem', color: '#1f2937' }}>
-              Our Story
-            </h2>
-            <p style={{ fontSize: '1.125rem', color: '#6b7280', marginBottom: '1.5rem', lineHeight: 1.6 }}>
-              Established as part of the university's marketing initiative, our store has been
-              serving the campus community for over a decade.
-            </p>
-            <p style={{ fontSize: '1.125rem', color: '#6b7280', marginBottom: '1.5rem', lineHeight: 1.6 }}>
-              What started as a small merchandise counter has grown into a comprehensive store
-              offering everything from academic furniture to branded apparel and event equipment.
-            </p>
-            <p style={{ fontSize: '1.125rem', color: '#6b7280', lineHeight: 1.6 }}>
-              Today, we continue to expand our offerings while maintaining our commitment to
-              quality and service that our community has come to expect.
-            </p>
-          </div>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>
+            Our Story
+          </h2>
+        </div>
+        <div className="card" style={{ padding: '3rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+          <p style={{ fontSize: '1.125rem', color: '#6b7280', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+            Established as part of the university's marketing initiative, our store has been
+            serving the campus community for over a decade.
+          </p>
+          <p style={{ fontSize: '1.125rem', color: '#6b7280', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+            What started as a small merchandise counter has grown into a comprehensive store
+            offering everything from academic furniture to branded apparel and event equipment.
+          </p>
+          <p style={{ fontSize: '1.125rem', color: '#6b7280', lineHeight: 1.6 }}>
+            Today, we continue to expand our offerings while maintaining our commitment to
+            quality and service that our community has come to expect.
+          </p>
         </div>
       </section>
 
@@ -225,7 +210,7 @@ const About: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3" style={{ gap: '2rem' }}>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5" style={{ gap: '2rem' }}>
           {team.map((member, idx) => (
             <Card key={member.name} sx={{ p: 2, textAlign: 'center', borderRadius: 3, boxShadow: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 370 }}>
               <div style={{
