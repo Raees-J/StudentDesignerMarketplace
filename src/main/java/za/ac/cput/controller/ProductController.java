@@ -35,18 +35,53 @@ public class ProductController {
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody Product productInput){
-        Product newProduct = ProductFactory.buildProduct(
-                productInput.getName(),
-                productInput.getDescription(),
-                productInput.getPrice(),
-                productInput.getImageUrl(),
-                productInput.getCategory()
-        );
-        if(newProduct == null){
-            return ResponseEntity.badRequest().body("Invalid input fields");
+        try {
+            Product newProduct;
+            
+            // Check if additional fields are provided
+            if (productInput.getSizes() != null || productInput.getColors() != null || productInput.getFeatures() != null) {
+                // Convert comma-separated strings to lists for processing
+                List<String> sizes = productInput.getSizes() != null && !productInput.getSizes().trim().isEmpty() 
+                    ? List.of(productInput.getSizes().split(",")) : List.of();
+                List<String> colors = productInput.getColors() != null && !productInput.getColors().trim().isEmpty() 
+                    ? List.of(productInput.getColors().split(",")) : List.of();
+                List<String> features = productInput.getFeatures() != null && !productInput.getFeatures().trim().isEmpty() 
+                    ? List.of(productInput.getFeatures().split(",")) : List.of();
+                
+                newProduct = ProductFactory.buildProduct(
+                        productInput.getName(),
+                        productInput.getDescription(),
+                        productInput.getPrice(),
+                        productInput.getImageUrl(),
+                        productInput.getCategory(),
+                        productInput.isInStock(),
+                        sizes,
+                        colors,
+                        features
+                );
+            } else {
+                // Use basic factory method for backward compatibility
+                newProduct = ProductFactory.buildProduct(
+                        productInput.getName(),
+                        productInput.getDescription(),
+                        productInput.getPrice(),
+                        productInput.getImageUrl(),
+                        productInput.getCategory()
+                );
+            }
+            
+            if(newProduct == null){
+                return ResponseEntity.badRequest().body("Invalid input fields");
+            }
+            
+            Product saved = productService.create(newProduct);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            System.err.println("Error creating product: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error creating product: " + e.getMessage());
         }
-        Product saved = productService.create(newProduct);
-        return ResponseEntity.ok(saved);
     }
     // Test endpoint for testProduct
     @GetMapping("/testProduct")
