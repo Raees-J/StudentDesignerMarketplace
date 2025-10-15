@@ -17,6 +17,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     protected UUID userId;
 
+    protected String firstName;
+    protected String lastName;
     protected String email;
     protected String password;
     protected String role;
@@ -25,7 +27,9 @@ public class User {
         // Required by JPA
     }
 
-    public User(String email, String password, String role) {
+    public User(String firstName, String lastName, String email, String password, String role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -33,6 +37,8 @@ public class User {
 
     // ✅ Builder-based constructor
     public User(Builder builder) {
+        this.firstName = builder.firstName;
+        this.lastName = builder.lastName;
         this.email = builder.email;
         this.password = builder.password;
         this.role = builder.role;
@@ -40,6 +46,14 @@ public class User {
 
     public UUID getUserId() {
         return userId;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     public String getEmail() {
@@ -58,6 +72,8 @@ public class User {
     public String toString() {
         return "User{" +
                 "userId=" + userId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
@@ -66,9 +82,21 @@ public class User {
 
     // ✅ Builder class
     public static class Builder {
+        private String firstName;
+        private String lastName;
         private String email;
         private String password;
         private String role;
+
+        public Builder setFirstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public Builder setLastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
 
         public Builder setEmail(String email) {
             this.email = email;
@@ -86,6 +114,8 @@ public class User {
         }
 
         public Builder copy(User user) {
+            this.firstName = user.firstName;
+            this.lastName = user.lastName;
             this.email = user.email;
             this.password = user.password;
             this.role = user.role;
