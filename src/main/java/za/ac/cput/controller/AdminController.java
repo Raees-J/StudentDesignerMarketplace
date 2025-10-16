@@ -8,6 +8,7 @@ package za.ac.cput.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.Admin;
 import za.ac.cput.factory.AdminFactory;
@@ -23,11 +24,13 @@ public class AdminController {
 
     private final AdminService adminService;
     private final AdminRepository adminRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AdminController(AdminService adminService, AdminRepository adminRepository) {
+    public AdminController(AdminService adminService, AdminRepository adminRepository, PasswordEncoder passwordEncoder) {
         this.adminService = adminService;
         this.adminRepository = adminRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/register")
@@ -60,27 +63,23 @@ public class AdminController {
         try {
             System.out.println("Login attempt: " + loginInput.getEmail());
 
-            List<Admin> admins = adminRepository.findAllByEmail(loginInput.getEmail());
+            Admin foundAdmin = adminRepository.findByEmail(loginInput.getEmail().trim().toLowerCase());
 
-            if (admins.isEmpty()) {
+            if (foundAdmin == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email not found");
             }
 
-            Admin matched = admins.stream()
-                    .filter(a -> a.getPassword().equals(loginInput.getPassword()))
-                    .findFirst()
-                    .orElse(null);
+            if (!passwordEncoder.matches(loginInput.getPassword(), foundAdmin.getPassword())) {
 
-            if (matched == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
             }
 
             AdminLoginDTO dto = new AdminLoginDTO(
-                    matched.getId(),
-                    matched.getFirstName(),
-                    matched.getLastName(),
-                    matched.getEmail(),
-                    matched.getRole()
+                    foundAdmin.getId(),
+                    foundAdmin.getFirstName(),
+                    foundAdmin.getLastName(),
+                    foundAdmin.getEmail(),
+                    foundAdmin.getRole()
             );
 
             return ResponseEntity.ok(dto);

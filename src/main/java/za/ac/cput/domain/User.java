@@ -6,10 +6,15 @@
 
 package za.ac.cput.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+
+import java.util.Locale;
 import java.util.UUID;
 
 @Entity
+@Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
@@ -17,10 +22,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     protected UUID userId;
 
+    @Column(name = "first_name")
     protected String firstName;
+
+    @Column(name = "last_name")
     protected String lastName;
+
+    @Email
+    @Column(nullable = false, unique = true, length = 191)
     protected String email;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(nullable = false)
     protected String password;
+
+    @Column(nullable = false, length = 32)
     protected String role;
 
     protected User() {
@@ -39,9 +55,9 @@ public class User {
     public User(Builder builder) {
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
-        this.email = builder.email;
+        this.email = normalizeEmail(builder.email);
         this.password = builder.password;
-        this.role = builder.role;
+        this.role = normalizeRole(builder.role);
     }
 
     public UUID getUserId() {
@@ -60,13 +76,27 @@ public class User {
         return email;
     }
 
+    public String getRole() {
+        return role;
+    }
+
     public String getPassword() {
         return password;
     }
 
-    public String getRole() {
-        return role;
+    @PrePersist
+    @PreUpdate
+    protected void onPersistOrUpdate() {
+        this.email = normalizeEmail(this.email);
+        this.role = normalizeRole(this.role);
     }
+
+    private String normalizeEmail(String value) {
+        return value == null ? null : value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String normalizeRole(String value) {
+        return value == null ? null : value.trim().toUpperCase(Locale.ROOT);
 
     @Override
     public String toString() {
@@ -75,7 +105,6 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }
