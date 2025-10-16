@@ -55,8 +55,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/admins/register", "/admins/login", "/customer/create", "/customer/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/admins/ping").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.GET,
+                                "/admins/ping",
+                                "/products/**",
+                                "/reviews/**",
+                                "/orders/**").permitAll()                        .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .headers(headers -> headers

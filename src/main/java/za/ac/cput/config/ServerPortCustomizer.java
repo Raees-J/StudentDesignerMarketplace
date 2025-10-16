@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.server.AbstractConfigurableWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ public class ServerPortCustomizer implements WebServerFactoryCustomizer<Configur
 
     @Override
     public void customize(ConfigurableServletWebServerFactory factory) {
-        Integer configuredPort = factory.getPort();
+        Integer configuredPort = extractConfiguredPort(factory);
         int desiredPort = resolveDesiredPort(configuredPort);
 
         if (desiredPort == 0) {
@@ -38,6 +39,13 @@ public class ServerPortCustomizer implements WebServerFactoryCustomizer<Configur
         factory.setPort(fallbackPort);
         LOGGER.warn("Port {} is already in use. Falling back to available port {}.", desiredPort, fallbackPort);
         LOGGER.info("To use a specific port, set the 'server.port' property or SERVER_PORT environment variable.");
+    }
+
+    private Integer extractConfiguredPort(ConfigurableServletWebServerFactory factory) {
+        if (factory instanceof AbstractConfigurableWebServerFactory configurableFactory) {
+            return configurableFactory.getPort();
+        }
+        return null;
     }
 
     private int resolveDesiredPort(Integer configuredPort) {
