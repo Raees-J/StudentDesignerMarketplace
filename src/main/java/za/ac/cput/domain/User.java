@@ -97,62 +97,63 @@ public class User {
 
     private String normalizeRole(String value) {
         return value == null ? null : value.trim().toUpperCase(Locale.ROOT);
+    }
 
     @Override
-    public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", role='" + role + '\'' +
-                '}';
-    }
-
-    // ✅ Builder class
-    public static class Builder {
-        private String firstName;
-        private String lastName;
-        private String email;
-        private String password;
-        private String role;
-
-        public Builder setFirstName(String firstName) {
-            this.firstName = firstName;
-            return this;
+        public String toString () {
+            return "User{" +
+                    "userId=" + userId +
+                    ", firstName='" + firstName + '\'' +
+                    ", lastName='" + lastName + '\'' +
+                    ", email='" + email + '\'' +
+                    ", role='" + role + '\'' +
+                    '}';
         }
 
-        public Builder setLastName(String lastName) {
-            this.lastName = lastName;
-            return this;
-        }
+        // ✅ Builder class
+        public static class Builder {
+            private String firstName;
+            private String lastName;
+            private String email;
+            private String password;
+            private String role;
 
-        public Builder setEmail(String email) {
-            this.email = email;
-            return this;
-        }
+            public Builder setFirstName(String firstName) {
+                this.firstName = firstName;
+                return this;
+            }
 
-        public Builder setPassword(String password) {
-            this.password = password;
-            return this;
-        }
+            public Builder setLastName(String lastName) {
+                this.lastName = lastName;
+                return this;
+            }
 
-        public Builder setRole(String role) {
-            this.role = role;
-            return this;
-        }
+            public Builder setEmail(String email) {
+                this.email = email;
+                return this;
+            }
 
-        public Builder copy(User user) {
-            this.firstName = user.firstName;
-            this.lastName = user.lastName;
-            this.email = user.email;
-            this.password = user.password;
-            this.role = user.role;
-            return this;
-        }
+            public Builder setPassword(String password) {
+                this.password = password;
+                return this;
+            }
 
-        public User build() {
-            return new User(this);
+            public Builder setRole(String role) {
+                this.role = role;
+                return this;
+            }
+
+            public Builder copy(User user) {
+                this.firstName = user.firstName;
+                this.lastName = user.lastName;
+                this.email = user.email;
+                this.password = user.password;
+                this.role = user.role;
+                return this;
+            }
+
+            public User build() {
+                return new User(this);
+            }
         }
-    }
 }

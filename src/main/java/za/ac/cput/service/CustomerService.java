@@ -19,6 +19,7 @@ public class CustomerService implements ICustomerService {
     @Autowired
     public CustomerService(CustomerRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
