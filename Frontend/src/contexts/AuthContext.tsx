@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { useNotification } from './NotificationContext';
 import { loginAdmin, loginCustomer, registerCustomer } from '../api/profileApi';
 
 export interface User {
@@ -32,8 +32,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [role, setRole] = useState<'admin' | 'user' | null>(null);
   const [loading, setLoading] = useState(false);
+  const { showSuccess, showError } = useNotification();
 
-  
+
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
     const savedRole = localStorage.getItem('userRole');
@@ -51,57 +52,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-  setLoading(true);
-  try {
-    let response;
-    let detectedRole: 'admin' | 'user' = 'user';
+    setLoading(true);
 
-    // Try logging in as admin first
     try {
-      response = await loginAdmin({ email, password });
-      detectedRole = 'admin';
-    } catch {
-      
-      response = await loginCustomer({ email, password });
-      detectedRole = 'user';
+      let response;
+      let detectedRole: 'admin' | 'user' = 'user';
+
+      // Try logging in as admin first
+      try {
+        response = await loginAdmin({ email, password });
+        detectedRole = 'admin';
+      } catch {
+        response = await loginCustomer({ email, password });
+        detectedRole = 'user';
+      }
+
+      if (response && (response.success || response.id || response.email)) {
+        const userData: User = {
+          id: response.id?.toString() || response.userId?.toString() || email,
+          email: response.email || email,
+          name:
+              response.name ||
+              `${response.firstName || ''} ${response.lastName || ''}`.trim() ||
+              'User',
+          firstName: response.firstName,
+          lastName: response.lastName,
+          role: detectedRole,
+        };
+
+        setCurrentUser(userData);
+        setRole(detectedRole);
+
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+        localStorage.setItem('userRole', detectedRole);
+
+        showSuccess(`Welcome back, ${userData.name}!`);
+        return true;
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      const errorMessage =
+          error?.response?.data?.message ||
+          error?.message ||
+          'Login failed. Please check your credentials.';
+      showError(errorMessage);
+      return false;
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (response && (response.success || response.id || response.email)) {
-      const userData: User = {
-        id: response.id?.toString() || response.userId?.toString() || email,
-        email: response.email || email,
-        name:
-          response.name ||
-          `${response.firstName || ''} ${response.lastName || ''}`.trim() ||
-          'User',
-        firstName: response.firstName,
-        lastName: response.lastName,
-        role: detectedRole,
-      };
-
-      setCurrentUser(userData);
-      setRole(detectedRole);
-
-      localStorage.setItem('currentUser', JSON.stringify(userData));
-      localStorage.setItem('userRole', detectedRole);
-
-      toast.success(`Welcome back, ${userData.name}!`);
-      return true;
-    } else {
-      throw new Error('Invalid response from server');
-    }
-  } catch (error: any) {
-    console.error('Login error:', error);
-    const errorMessage =
-      error?.response?.data?.message ||
-      error?.message ||
-      'Login failed. Please check your credentials.';
-    toast.error(errorMessage);
-    return false;
-  } finally {
-    setLoading(false);
-  }
-};
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     setLoading(true);
@@ -117,7 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         await login(email, password); // Auto-login after successful registration
 
-        toast.success(`Welcome, ${name}! Your account has been created.`);
+        showSuccess(`Welcome, ${name}! Your account has been created.`);
         return true;
       } else {
         throw new Error('Registration failed');
@@ -125,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       console.error('Registration error:', error);
       const errorMessage = error?.message || 'Registration failed. Please try again.';
-      toast.error(errorMessage);
+      showError(errorMessage);
       return false;
     } finally {
       setLoading(false);
@@ -137,7 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setRole(null);
     localStorage.removeItem('currentUser');
     localStorage.removeItem('userRole');
-    toast.success('Logged out successfully');
+    showSuccess('Logged out successfully');
   };
 
   return (

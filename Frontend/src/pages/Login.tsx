@@ -1,8 +1,8 @@
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -14,8 +14,9 @@ const Login: React.FC = () => {
 
   const { login, loading, currentUser } = useAuth();
   const navigate = useNavigate();
+    const { showError } = useNotification();
 
-  useEffect(() => {
+    useEffect(() => {
     // If already logged in, redirect based on role
     if (currentUser) {
       if (currentUser.role === 'admin') {
@@ -73,7 +74,7 @@ const Login: React.FC = () => {
         // role-based redirect happens automatically via useEffect
       }
     } catch (error) {
-      toast.error('Login failed. Please try again.');
+        showError('Login failed. Please try again.');
     }
   };
 
