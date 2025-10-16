@@ -20,6 +20,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "user_id", columnDefinition = "BINARY(16)")
     protected UUID userId;
 
     @Column(name = "first_name")
