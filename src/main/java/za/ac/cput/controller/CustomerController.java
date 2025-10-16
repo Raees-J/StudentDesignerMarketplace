@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import za.ac.cput.domain.UType.Customer;
 import za.ac.cput.service.CustomerService;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -19,9 +21,21 @@ public class CustomerController {
         this.customerService = customerService;
     }
     @PostMapping("/create")
-    public ResponseEntity<Customer> create(@RequestBody Customer customer) {
-        Customer createdCustomer = customerService.create(customer);
-        return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+    public ResponseEntity<?> create(@RequestBody Customer customer) {
+        try {
+            Customer createdCustomer = customerService.create(customer);
+            if (createdCustomer == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Invalid customer data"));
+            }
+            return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", e.getMessage()));
+        }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
+        }
     }
     @GetMapping("/read/{id}")
     public ResponseEntity<Customer> read(@PathVariable UUID id) {
@@ -32,12 +46,17 @@ public class CustomerController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     @PutMapping("/update")
-    public ResponseEntity<Customer> update(@RequestBody Customer customer) {
-        Customer updatedCustomer = customerService.update(customer);
-        if (updatedCustomer != null) {
-            return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
+    public ResponseEntity<?> update(@RequestBody Customer customer) {
+        try {
+            Customer updatedCustomer = customerService.update(customer);
+            if (updatedCustomer != null) {
+                return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", e.getMessage()));
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
