@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173"
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/customer")
 public class CustomerController {
     private final CustomerService customerService;
