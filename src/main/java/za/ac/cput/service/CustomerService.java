@@ -9,9 +9,9 @@ import za.ac.cput.repository.CustomerRepository;
 import za.ac.cput.repository.UserRepository;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Locale;
 
 @Service
 public class CustomerService implements ICustomerService {
@@ -21,7 +21,9 @@ public class CustomerService implements ICustomerService {
     private final UserRepository userRepository;
 
     @Autowired
-    public CustomerService(CustomerRepository repository, PasswordEncoder passwordEncoder, UserRepository userRepository) {
+    public CustomerService(CustomerRepository repository,
+                           PasswordEncoder passwordEncoder,
+                           UserRepository userRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
@@ -33,10 +35,8 @@ public class CustomerService implements ICustomerService {
             return null;
         }
 
-        ensureEmailIsUnique(customer.getEmail());
-
+        ensureEmailIsUnique(customer.getEmail(), null);
         Customer preparedCustomer = prepareCustomerForPersistence(customer);
-        validateEmailUniqueness(preparedCustomer.getEmail(), null);
         return repository.save(preparedCustomer);
     }
 
@@ -50,16 +50,13 @@ public class CustomerService implements ICustomerService {
         if (customer == null || customer.getUserId() == null) {
             return null;
         }
-        if (customer == null || customer.getUserId() == null) {
+
+        if (!repository.existsById(customer.getUserId())) {
             return null;
         }
-        if (repository.existsById(customer.getUserId())) {
-            ensureEmailBelongsToCustomer(customer);
-            Customer preparedCustomer = prepareCustomerForPersistence(customer);
-            validateEmailUniqueness(preparedCustomer.getEmail(), customer.getUserId());
-            return repository.save(preparedCustomer);
-        }
-        return null;
+        ensureEmailIsUnique(customer.getEmail(), customer.getUserId());
+        Customer preparedCustomer = prepareCustomerForPersistence(customer);
+        return repository.save(preparedCustomer);
     }
 
     @Override
@@ -76,17 +73,15 @@ public class CustomerService implements ICustomerService {
     @Override
     public List<Customer> findByPaymentMethod(String paymentMethod) {
         return repository.findByPaymentMethod(paymentMethod);
-        }
-}
+    }
 
-
-@Override
+    @Override
     public Customer login(String email, String password) {
         if (email == null || password == null) {
             return null;
         }
 
-        Customer storedCustomer = repository.findByEmailIgnoreCase(email.trim().toLowerCase());
+        Customer storedCustomer = repository.findByEmailIgnoreCase(normalizeEmail(email));
         if (storedCustomer != null && passwordEncoder.matches(password, storedCustomer.getPassword())) {
             return storedCustomer;
         }
@@ -96,45 +91,26 @@ public class CustomerService implements ICustomerService {
 
     private Customer prepareCustomerForPersistence(Customer customer) {
         Customer.Builder builder = new Customer.Builder().copy(customer);
-        String resolvedRole = customer.getRole() == null ? "CUSTOMER" : customer.getRole().toUpperCase(Locale.ROOT);
+        String resolvedRole = customer.getRole() == null
+                ? "CUSTOMER"
+                : customer.getRole().toUpperCase(Locale.ROOT);
         builder.setRole(resolvedRole);
         builder.setPassword(encodeIfNeeded(customer.getPassword()));
         return builder.build();
     }
 
-private void ensureEmailIsUnique(String email) {
-    if (email == null || email.isBlank()) {
-        return;
-    }
+    private void ensureEmailIsUnique(String email, UUID currentCustomerId) {
 
-    String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
-    if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
-        throw new IllegalStateException("Email already exists");
-    }
-}
-
-private void ensureEmailBelongsToCustomer(Customer customer) {
-    if (customer.getEmail() == null || customer.getEmail().isBlank()) {
-        return;
-    }
-
-    String normalizedEmail = customer.getEmail().trim().toLowerCase(Locale.ROOT);
-    Optional<User> existing = userRepository.findByEmailIgnoreCase(normalizedEmail);
-    if (existing.isPresent() && !existing.get().getUserId().equals(customer.getUserId())) {
-        throw new IllegalStateException("Email already exists");
-    }
-}
-
-    private void validateEmailUniqueness(String email, UUID customerId) {
         String normalizedEmail = normalizeEmail(email);
         if (normalizedEmail == null || normalizedEmail.isBlank()) {
             throw new IllegalArgumentException("Email is required");
         }
 
-        Customer existingCustomer = repository.findByEmailIgnoreCase(normalizedEmail);
-        if (existingCustomer != null) {
-            if (customerId == null || !existingCustomer.getUserId().equals(customerId)) {
-                throw new IllegalArgumentException("A customer with this email already exists");
+        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(normalizedEmail);
+        if (existingUser.isPresent()) {
+            UUID existingUserId = existingUser.get().getUserId();
+            if (currentCustomerId == null || !existingUserId.equals(currentCustomerId)) {
+                throw new IllegalStateException("Email already exists");
             }
         }
     }
