@@ -14,7 +14,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
