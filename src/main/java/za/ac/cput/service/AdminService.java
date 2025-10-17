@@ -11,6 +11,7 @@ import za.ac.cput.domain.Admin;
 import za.ac.cput.repository.AdminRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminService implements IAdminService {
@@ -79,9 +80,9 @@ public class AdminService implements IAdminService {
     }
 
     public String verify(Admin admin) {
-        Admin foundAdmin = repository.findByEmail(admin.getEmail());
+        Optional<Admin> foundAdmin = repository.findByEmail(admin.getEmail());
 
-        if (foundAdmin != null && foundAdmin.getPassword().equals(admin.getPassword())) {
+        if (foundAdmin != null && foundAdmin.getClass().equals(admin.getPassword())) {
             return "success";
         } else {
             return "fail";
