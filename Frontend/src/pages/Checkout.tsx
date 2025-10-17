@@ -18,11 +18,20 @@ const Checkout: React.FC = () => {
     email: currentUser?.email || '',
     phone: '',
 
-    // Payment Information
+    // Payment Method
+    paymentMethod: 'Card',
+
+    // Payment Information (Card)
     cardNumber: '',
     expiryDate: '',
     cvv: '',
-    cardName: ''
+    cardName: '',
+
+    // EFT Information
+    bankName: '',
+    accountNumber: '',
+    branchCode: '',
+    accountHolder: ''
   })
 
   const [loading, setLoading] = useState(false)
@@ -48,11 +57,21 @@ const Checkout: React.FC = () => {
         productID: item.id,
         customerID: currentUser.id,
         quantity: item.quantity,
-        total: item.price * item.quantity
+        total: item.price * item.quantity,
+        paymentMethod: formData.paymentMethod
       };
       await createOrder(order);
       clearCart();
-      toast.success('Order placed successfully!');
+      
+      // Different success messages based on payment method
+      if (formData.paymentMethod === 'Cash') {
+        toast.success('Order placed! Check your email for collection details.');
+      } else if (formData.paymentMethod === 'EFT') {
+        toast.success('Order placed! EFT payment details sent to your email.');
+      } else {
+        toast.success('Order placed successfully!');
+      }
+      
       navigate('/profile');
     } catch (error) {
       toast.error('Failed to process payment. Please try again.')
@@ -174,65 +193,268 @@ const Checkout: React.FC = () => {
                     <h3 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Payment Information</h3>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                        Cardholder Name *
-                      </label>
-                      <input
-                          type="text"
-                          name="cardName"
-                          value={formData.cardName}
-                          onChange={handleInputChange}
-                          className="input"
-                          required
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                        Card Number *
-                      </label>
-                      <input
-                          type="text"
-                          name="cardNumber"
-                          value={formData.cardNumber}
-                          onChange={handleInputChange}
-                          className="input"
-                          placeholder="1234 5678 9012 3456"
-                          required
-                      />
-                    </div>
-                    <div className="grid md:grid-cols-2" style={{ gap: '1rem' }}>
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                          Expiry Date *
-                        </label>
+                  {/* Payment Method Selection */}
+                  <div style={{ marginBottom: '2rem' }}>
+                    <label style={{ display: 'block', marginBottom: '1rem', fontWeight: '500' }}>
+                      Select Payment Method *
+                    </label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <label style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.5rem', 
+                        padding: '1rem', 
+                        border: '2px solid', 
+                        borderColor: formData.paymentMethod === 'Card' ? '#3b82f6' : '#e5e7eb',
+                        borderRadius: '0.5rem',
+                        cursor: 'pointer',
+                        backgroundColor: formData.paymentMethod === 'Card' ? '#eff6ff' : 'white'
+                      }}>
                         <input
-                            type="text"
-                            name="expiryDate"
-                            value={formData.expiryDate}
-                            onChange={handleInputChange}
-                            className="input"
-                            placeholder="MM/YY"
-                            required
+                          type="radio"
+                          name="paymentMethod"
+                          value="Card"
+                          checked={formData.paymentMethod === 'Card'}
+                          onChange={handleInputChange}
+                          style={{ margin: 0 }}
                         />
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                          CVV *
-                        </label>
+                        <CreditCard size={20} />
+                        <div>
+                          <strong>Credit/Debit Card</strong>
+                          <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
+                            Pay securely with your card
+                          </p>
+                        </div>
+                      </label>
+
+                      <label style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.5rem', 
+                        padding: '1rem', 
+                        border: '2px solid', 
+                        borderColor: formData.paymentMethod === 'EFT' ? '#3b82f6' : '#e5e7eb',
+                        borderRadius: '0.5rem',
+                        cursor: 'pointer',
+                        backgroundColor: formData.paymentMethod === 'EFT' ? '#eff6ff' : 'white'
+                      }}>
                         <input
-                            type="text"
-                            name="cvv"
-                            value={formData.cvv}
-                            onChange={handleInputChange}
-                            className="input"
-                            placeholder="123"
-                            required
+                          type="radio"
+                          name="paymentMethod"
+                          value="EFT"
+                          checked={formData.paymentMethod === 'EFT'}
+                          onChange={handleInputChange}
+                          style={{ margin: 0 }}
                         />
-                      </div>
+                        <span style={{ fontSize: '1.25rem' }}>🏦</span>
+                        <div>
+                          <strong>EFT Payment</strong>
+                          <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
+                            Electronic Funds Transfer
+                          </p>
+                        </div>
+                      </label>
+
+                      <label style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.5rem', 
+                        padding: '1rem', 
+                        border: '2px solid', 
+                        borderColor: formData.paymentMethod === 'Cash' ? '#3b82f6' : '#e5e7eb',
+                        borderRadius: '0.5rem',
+                        cursor: 'pointer',
+                        backgroundColor: formData.paymentMethod === 'Cash' ? '#eff6ff' : 'white'
+                      }}>
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="Cash"
+                          checked={formData.paymentMethod === 'Cash'}
+                          onChange={handleInputChange}
+                          style={{ margin: 0 }}
+                        />
+                        <span style={{ fontSize: '1.25rem' }}>💰</span>
+                        <div>
+                          <strong>Cash on Pickup</strong>
+                          <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
+                            Pay in cash when you collect your order
+                          </p>
+                        </div>
+                      </label>
                     </div>
                   </div>
+
+                  {/* Payment Details Forms */}
+                  {formData.paymentMethod === 'Card' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                          Cardholder Name *
+                        </label>
+                        <input
+                            type="text"
+                            name="cardName"
+                            value={formData.cardName}
+                            onChange={handleInputChange}
+                            className="input"
+                            required
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                          Card Number *
+                        </label>
+                        <input
+                            type="text"
+                            name="cardNumber"
+                            value={formData.cardNumber}
+                            onChange={handleInputChange}
+                            className="input"
+                            placeholder="1234 5678 9012 3456"
+                            required
+                        />
+                      </div>
+                      <div className="grid md:grid-cols-2" style={{ gap: '1rem' }}>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                            Expiry Date *
+                          </label>
+                          <input
+                              type="text"
+                              name="expiryDate"
+                              value={formData.expiryDate}
+                              onChange={handleInputChange}
+                              className="input"
+                              placeholder="MM/YY"
+                              required
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                            CVV *
+                          </label>
+                          <input
+                              type="text"
+                              name="cvv"
+                              value={formData.cvv}
+                              onChange={handleInputChange}
+                              className="input"
+                              placeholder="123"
+                              required
+                          />
+                        </div>
+                      </div>
+                      <div style={{ 
+                        padding: '1rem', 
+                        backgroundColor: '#fef3c7', 
+                        borderRadius: '0.5rem',
+                        border: '1px solid #f59e0b'
+                      }}>
+                        <p style={{ margin: 0, fontSize: '0.875rem', color: '#92400e' }}>
+                          ⚠️ <strong>Note:</strong> This is a demo system. Card details are not processed or stored.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {formData.paymentMethod === 'EFT' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                          Bank Name *
+                        </label>
+                        <select
+                            name="bankName"
+                            value={formData.bankName}
+                            onChange={handleInputChange}
+                            className="input"
+                            required
+                        >
+                          <option value="">Select your bank</option>
+                          <option value="ABSA">ABSA</option>
+                          <option value="Standard Bank">Standard Bank</option>
+                          <option value="FNB">FNB</option>
+                          <option value="Nedbank">Nedbank</option>
+                          <option value="Capitec">Capitec</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                          Account Holder Name *
+                        </label>
+                        <input
+                            type="text"
+                            name="accountHolder"
+                            value={formData.accountHolder}
+                            onChange={handleInputChange}
+                            className="input"
+                            required
+                        />
+                      </div>
+                      <div className="grid md:grid-cols-2" style={{ gap: '1rem' }}>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                            Account Number *
+                          </label>
+                          <input
+                              type="text"
+                              name="accountNumber"
+                              value={formData.accountNumber}
+                              onChange={handleInputChange}
+                              className="input"
+                              placeholder="123456789"
+                              required
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                            Branch Code *
+                          </label>
+                          <input
+                              type="text"
+                              name="branchCode"
+                              value={formData.branchCode}
+                              onChange={handleInputChange}
+                              className="input"
+                              placeholder="123456"
+                              required
+                          />
+                        </div>
+                      </div>
+                      <div style={{ 
+                        padding: '1rem', 
+                        backgroundColor: '#dbeafe', 
+                        borderRadius: '0.5rem',
+                        border: '1px solid #3b82f6'
+                      }}>
+                        <p style={{ margin: 0, fontSize: '0.875rem', color: '#1e40af' }}>
+                          💡 <strong>EFT Instructions:</strong> You will receive payment details via email to complete your EFT transfer. Your order will be processed once payment is confirmed.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {formData.paymentMethod === 'Cash' && (
+                    <div style={{ 
+                      padding: '1.5rem', 
+                      backgroundColor: '#f0fdf4', 
+                      borderRadius: '0.5rem',
+                      border: '2px solid #16a34a'
+                    }}>
+                      <h4 style={{ margin: '0 0 1rem 0', color: '#15803d', fontSize: '1.125rem' }}>
+                        💰 Cash Payment Instructions
+                      </h4>
+                      <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.875rem', color: '#166534' }}>
+                        <li>Your order will be reserved for <strong>48 hours</strong></li>
+                        <li>Collect your item at the Design Department building</li>
+                        <li>Pay in cash when you collect your order</li>
+                        <li>Bring exact change if possible</li>
+                        <li>You will receive collection details via email</li>
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -293,7 +515,11 @@ const Checkout: React.FC = () => {
                     style={{ width: '100%', padding: '1rem' }}
                     disabled={loading}
                 >
-                  {loading ? 'Processing...' : `Place Order • R${finalTotal.toFixed(2)}`}
+                  {loading ? 'Processing...' : 
+                    formData.paymentMethod === 'Cash' ? `Reserve Order • R${finalTotal.toFixed(2)}` :
+                    formData.paymentMethod === 'EFT' ? `Place Order (EFT) • R${finalTotal.toFixed(2)}` :
+                    `Place Order • R${finalTotal.toFixed(2)}`
+                  }
                 </button>
               </div>
             </div>

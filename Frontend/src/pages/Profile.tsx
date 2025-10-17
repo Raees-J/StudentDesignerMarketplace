@@ -34,14 +34,16 @@ const Profile: React.FC = () => {
     const fetchProfile = async () => {
       try {
         setLoading(true)
-        const data = await getProfile()
-        setProfileData(data)
+        if (currentUser?.email) {
+          const data = await getProfile(currentUser.email)
+          setProfileData(data)
+        }
       } catch (err: any) {
         console.error('Error fetching profile:', err);
         // If profile API fails, populate with current user data
         if (currentUser) {
           setProfileData({
-            displayName: currentUser.name || '',
+            displayName: currentUser.name || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 'User',
             email: currentUser.email || '',
             phone: '',
             address: '',
@@ -71,12 +73,21 @@ const Profile: React.FC = () => {
       try {
         // Fetch products first to get product names
         const allProducts = await getAllProducts()
+        console.log('Products from API:', allProducts);
         setProducts(allProducts)
+        
+        // If API products are empty, use static products as fallback
+        if (!allProducts || allProducts.length === 0) {
+          const { products: staticProducts } = await import('../data/products');
+          console.log('Using static products as fallback:', staticProducts);
+          setProducts(staticProducts);
+        }
         
         // Then fetch orders
         const allOrders = await getAllOrders()
         console.log('All orders fetched:', allOrders); // Debug log
         console.log('Current user:', currentUser); // Debug log
+        console.log('All products:', allProducts); // Debug log
         
         // Filter orders for current user - try multiple field combinations
         const userOrders = allOrders.filter((order: any) => {
@@ -126,8 +137,10 @@ const Profile: React.FC = () => {
     setError('')
     setSuccess('')
     try {
-      await updateProfile(profileData)
-      setSuccess('Profile updated successfully!')
+      if (currentUser?.email) {
+        await updateProfile(currentUser.email, profileData)
+        setSuccess('Profile updated successfully!')
+      }
     } catch (err: any) {
       setError('Failed to update profile')
     }
@@ -140,8 +153,10 @@ const Profile: React.FC = () => {
     setError('')
     setSuccess('')
     try {
-      await changePassword(oldPassword, newPassword)
-      setSuccess('Password changed successfully!')
+      if (currentUser?.email) {
+        await changePassword(currentUser.email, oldPassword, newPassword)
+        setSuccess('Password changed successfully!')
+      }
     } catch (err: any) {
       setError('Failed to change password')
     }
@@ -152,9 +167,11 @@ const Profile: React.FC = () => {
     setError('')
     setSuccess('')
     try {
-      await deleteAccount()
-      setSuccess('Account deleted. Logging out...')
-      setTimeout(() => logout(), 1500)
+      if (currentUser?.email) {
+        await deleteAccount(currentUser.email)
+        setSuccess('Account deleted. Logging out...')
+        setTimeout(() => logout(), 1500)
+      }
     } catch (err: any) {
       setError('Failed to delete account')
     }
@@ -778,17 +795,34 @@ const Profile: React.FC = () => {
 
                 {!ordersLoading && !ordersError && orders.length > 0 && (
                   <div style={{ display: 'grid', gap: '1.5rem' }}>
-                    {orders.map((order: any) => {
+                    {orders.map((order: any, index) => {
                       // Map backend Order entity fields to UI fields
                       const orderId = order.orderID || order.id || order.orderId || 'N/A';
                       const orderDate = order.date || order.createdAt || order.orderDate || new Date().toISOString();
-                      const orderStatus = order.status || 'Pending';
+                      const orderStatus = order.status || order.paymentStatus || 'Pending';
+                      const paymentMethod = order.paymentMethod || 'Card';
+                      const paymentStatus = order.paymentStatus || 'PENDING';
                       const orderTotal = order.total || 0;
                       const productId = order.productID || order.productId;
                       const quantity = order.quantity || 1;
                       
-                      // Find product name by ID
-                      const product = products.find(p => p.id === productId);
+                      console.log(`Order ${index}:`, {
+                        orderId,
+                        productId,
+                        productIdType: typeof productId,
+                        quantity,
+                        orderTotal
+                      });
+                      
+                      // Find product name by ID - handle both string and number types
+                      const product = products.find(p => 
+                        p.id === productId || 
+                        p.id?.toString() === productId?.toString() ||
+                        p.id === parseInt(productId) ||
+                        p.id === productId?.toString()
+                      );
+                      console.log('Looking for product with ID:', productId, 'Found:', product);
+                      console.log('Available products:', products.map(p => ({ id: p.id, name: p.name })));
                       const productName = product ? product.name : `Product #${productId}`;
                       
                       // For single product orders (which is what the backend supports)
@@ -897,6 +931,57 @@ const Profile: React.FC = () => {
                                   </span>
                                 </div>
                               ))}
+                            </div>
+                          </div>
+
+                          {/* Payment Information Section */}
+                          <div style={{ marginBottom: '1.5rem' }}>
+                            <h4 style={{ 
+                              fontWeight: '600', 
+                              marginBottom: '1rem',
+                              color: '#374151',
+                              fontSize: '1.05rem'
+                            }}>
+                              Payment Information:
+                            </h4>
+                            <div style={{
+                              display: 'grid',
+                              gridTemplateColumns: '1fr 1fr',
+                              gap: '1rem',
+                              padding: '1rem',
+                              background: 'rgba(255, 255, 255, 0.7)',
+                              borderRadius: '12px',
+                              border: '1px solid #f1f5f9'
+                            }}>
+                              <div>
+                                <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Payment Method:</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
+                                  <span style={{ fontSize: '1rem' }}>
+                                    {paymentMethod === 'Card' ? '💳' : paymentMethod === 'EFT' ? '🏦' : paymentMethod === 'Cash' ? '💰' : '💳'}
+                                  </span>
+                                  <span style={{ fontWeight: '500', color: '#374151' }}>{paymentMethod}</span>
+                                </div>
+                              </div>
+                              <div>
+                                <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Payment Status:</span>
+                                <div style={{ marginTop: '0.25rem' }}>
+                                  <span style={{
+                                    padding: '0.25rem 0.75rem',
+                                    borderRadius: '8px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: '600',
+                                    textTransform: 'uppercase',
+                                    backgroundColor: 
+                                      paymentStatus === 'COMPLETED' ? '#10b981' :
+                                      paymentStatus === 'PENDING' ? '#f59e0b' :
+                                      paymentStatus === 'PENDING_PICKUP' ? '#3b82f6' :
+                                      paymentStatus === 'FAILED' ? '#ef4444' : '#6b7280',
+                                    color: 'white'
+                                  }}>
+                                    {paymentStatus.replace('_', ' ')}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
                           </div>
 

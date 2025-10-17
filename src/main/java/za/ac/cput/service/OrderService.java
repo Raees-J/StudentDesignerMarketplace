@@ -1,11 +1,12 @@
 package za.ac.cput.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import za.ac.cput.domain.Order;
 import za.ac.cput.repository.OrderRepository;
-
-import java.util.List;
 
 @Service
 public class OrderService implements IOrderService {
@@ -25,6 +26,8 @@ public class OrderService implements IOrderService {
                 .setCustomerID(order.getCustomerID())
                 .setQuantity(order.getQuantity())
                 .setTotal(order.getTotal())
+                .setPaymentMethod(order.getPaymentMethod())
+                .setPaymentStatus(order.getPaymentStatus())
                 .build();
         return repository.save(newOrder);
     }
@@ -43,6 +46,8 @@ public class OrderService implements IOrderService {
                     .setCustomerID(order.getCustomerID())
                     .setQuantity(order.getQuantity())
                     .setTotal(order.getTotal())
+                    .setPaymentMethod(order.getPaymentMethod())
+                    .setPaymentStatus(order.getPaymentStatus())
                     .build();
             return repository.save(updated);
         }

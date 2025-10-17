@@ -1573,12 +1573,14 @@ const AdminDashboard: React.FC = () => {
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {orders.map((order) => {
-                                    const orderId = order.id || order.orderId || 'N/A';
+                                    const orderId = order.orderID || order.id || order.orderId || 'N/A';
                                     const orderDate = order.date || order.createdAt || order.orderDate || '';
                                     const orderStatus = order.status || 'Pending';
                                     const orderTotal = order.total || order.amount || order.price || 0;
                                     const customerEmail = order.customerEmail || order.email || 'N/A';
                                     const productName = order.productName || 'N/A';
+                                    const paymentMethod = order.paymentMethod || 'Card';
+                                    const paymentStatus = order.paymentStatus || 'PENDING';
 
                                     const getStatusColor = (status: string) => {
                                         switch (status.toLowerCase()) {
@@ -1599,6 +1601,36 @@ const AdminDashboard: React.FC = () => {
                                         }
                                     };
 
+                                    const getPaymentStatusColor = (status: string) => {
+                                        switch (status.toUpperCase()) {
+                                            case 'COMPLETED':
+                                                return '#10b981';
+                                            case 'PENDING':
+                                                return '#f59e0b';
+                                            case 'PENDING_PICKUP':
+                                                return '#3b82f6';
+                                            case 'FAILED':
+                                                return '#ef4444';
+                                            case 'CANCELLED':
+                                                return '#6b7280';
+                                            default:
+                                                return '#6b7280';
+                                        }
+                                    };
+
+                                    const getPaymentMethodIcon = (method: string) => {
+                                        switch (method.toLowerCase()) {
+                                            case 'card':
+                                                return '💳';
+                                            case 'eft':
+                                                return '🏦';
+                                            case 'cash':
+                                                return '💰';
+                                            default:
+                                                return '💳';
+                                        }
+                                    };
+
                                     return (
                                         <div key={orderId} style={{
                                             backgroundColor: 'white',
@@ -1609,7 +1641,7 @@ const AdminDashboard: React.FC = () => {
                                         }}>
                                             <div style={{ 
                                                 display: 'grid', 
-                                                gridTemplateColumns: '1fr 1fr 1fr 200px', 
+                                                gridTemplateColumns: '1fr 1fr 1fr 1fr 200px', 
                                                 gap: '1rem', 
                                                 alignItems: 'center' 
                                             }}>
@@ -1645,10 +1677,41 @@ const AdminDashboard: React.FC = () => {
                                                         R{Number(orderTotal).toFixed(2)}
                                                     </p>
                                                 </div>
+
+                                                <div>
+                                                    <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.25rem' }}>
+                                                        Payment
+                                                    </p>
+                                                    <div style={{ 
+                                                        display: 'flex', 
+                                                        alignItems: 'center', 
+                                                        gap: '0.5rem',
+                                                        marginBottom: '0.5rem'
+                                                    }}>
+                                                        <span style={{ fontSize: '1rem' }}>
+                                                            {getPaymentMethodIcon(paymentMethod)}
+                                                        </span>
+                                                        <span style={{ fontWeight: '500', color: '#1e293b' }}>
+                                                            {paymentMethod}
+                                                        </span>
+                                                    </div>
+                                                    <span style={{
+                                                        padding: '0.25rem 0.5rem',
+                                                        borderRadius: '0.375rem',
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: '600',
+                                                        backgroundColor: getPaymentStatusColor(paymentStatus),
+                                                        color: 'white',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.025em'
+                                                    }}>
+                                                        {paymentStatus.replace('_', ' ')}
+                                                    </span>
+                                                </div>
                                                 
                                                 <div>
                                                     <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.5rem' }}>
-                                                        Status
+                                                        Order Status
                                                     </p>
                                                     <select
                                                         value={orderStatus}

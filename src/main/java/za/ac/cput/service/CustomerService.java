@@ -1,13 +1,13 @@
 package za.ac.cput.service;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import za.ac.cput.domain.UType.Customer;
 import za.ac.cput.repository.CustomerRepository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class CustomerService implements ICustomerService {
@@ -56,5 +56,10 @@ public class CustomerService implements ICustomerService {
     @Override
     public Customer login(String email, String password) {
         return repository.findByEmailAndPassword(email, password);
+    }
+
+    @Override
+    public Customer findByEmail(String email) {
+        return repository.findByEmail(email);
     }
 }

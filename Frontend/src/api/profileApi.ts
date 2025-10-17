@@ -103,11 +103,11 @@ export const getAllCustomers = async () => (await axiosInstance.get('/customer/g
 
 // ==================== PROFILE SECTION ====================
 
-export const getProfile = async () => (await axiosInstance.get('/profile')).data;
-export const updateProfile = async (profileData: any) => (await axiosInstance.put('/profile', profileData)).data;
-export const changePassword = async (oldPassword: string, newPassword: string) =>
-    (await axiosInstance.post('/profile/change-password', { oldPassword, newPassword })).data;
-export const deleteAccount = async () => (await axiosInstance.delete('/profile')).data;
+export const getProfile = async (email: string) => (await axiosInstance.get(`/profile?email=${encodeURIComponent(email)}`)).data;
+export const updateProfile = async (email: string, profileData: any) => (await axiosInstance.put(`/profile?email=${encodeURIComponent(email)}`, profileData)).data;
+export const changePassword = async (email: string, oldPassword: string, newPassword: string) =>
+    (await axiosInstance.post(`/profile/change-password?email=${encodeURIComponent(email)}`, { oldPassword, newPassword })).data;
+export const deleteAccount = async (email: string) => (await axiosInstance.delete(`/profile?email=${encodeURIComponent(email)}`)).data;
 
 // ==================== EXPORTS ====================
 
