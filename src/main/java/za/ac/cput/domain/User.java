@@ -85,6 +85,7 @@ public class User {
             return this;
         }
 
+
         public Builder copy(User user) {
             this.email = user.email;
             this.password = user.password;
