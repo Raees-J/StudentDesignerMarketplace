@@ -109,6 +109,14 @@ public class User {
                     ", email='" + email + '\'' +
                     ", role='" + role + '\'' +
                     '}';
+
+        public Builder copy(User user) {
+            this.firstName = user.firstName;
+            this.lastName = user.lastName;
+            this.email = user.email;
+            this.password = user.password;
+            this.role = user.role;
+            return this;
         }
 
         // ✅ Builder class
