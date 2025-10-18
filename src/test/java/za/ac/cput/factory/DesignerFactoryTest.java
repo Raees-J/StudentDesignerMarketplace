@@ -1,11 +1,10 @@
 package za.ac.cput.factory;
 import org.junit.jupiter.api.Test;
 import za.ac.cput.domain.UType.Designer;
-import java.net.MalformedURLException;
 import static org.junit.jupiter.api.Assertions.*;
 class DesignerFactoryTest {
     @Test
-    void createDesigner_ValidPortfolioURL() throws MalformedURLException {
+    void createDesigner_ValidPortfolioURL() {
         // Test case 1: Valid HTTP URL
         Designer designer1 = DesignerFactory.createDesigner("http://www.example.com/portfolio");
         assertNotNull(designer1);
@@ -20,7 +19,7 @@ class DesignerFactoryTest {
         assertEquals("https://www.behance.net/johndoe?page=1", designer3.getPortfolioURL());
     }
     @Test
-    void createDesigner_InvalidPortfolioURL() throws MalformedURLException {
+    void createDesigner_InvalidPortfolioURL() {
         // Test case 4: Invalid URL format (missing protocol)
         Designer designer4 = DesignerFactory.createDesigner("www.invalid-url.com");
         assertNull(designer4);

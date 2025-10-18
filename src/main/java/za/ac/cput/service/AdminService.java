@@ -6,6 +6,7 @@
 package za.ac.cput.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import za.ac.cput.domain.Admin;
 import za.ac.cput.repository.AdminRepository;
@@ -17,26 +18,20 @@ import java.util.Optional;
 public class AdminService implements IAdminService {
 
     private final AdminRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AdminService(AdminRepository repository) {
+    public AdminService(AdminRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
 
     @Override
     public Admin create(Admin admin) {
-        Admin newAdmin = new Admin.Builder()
-                .setId(admin.getId())
-                .setFirstName(admin.getFirstName())
-                .setLastName(admin.getLastName())
-                .setEmail(admin.getEmail())
-                .setPassword(admin.getPassword())
-                .setRole("ADMIN")
-                .build();
-
-        return repository.save(newAdmin);
+        Admin preparedAdmin = prepareAdmin(admin);
+        return repository.save(preparedAdmin);
     }
 
     @Override
@@ -47,16 +42,8 @@ public class AdminService implements IAdminService {
     @Override
     public Admin update(Admin admin) {
         if (repository.existsById(admin.getId())) {
-            Admin updatedAdmin = new Admin.Builder()
-                    .setId(admin.getId())
-                    .setFirstName(admin.getFirstName())
-                    .setLastName(admin.getLastName())
-                    .setEmail(admin.getEmail())
-                    .setPassword(admin.getPassword())
-                    .setRole("ADMIN")
-                    .build();
-
-            return repository.save(updatedAdmin);
+            Admin preparedAdmin = prepareAdmin(admin);
+            return repository.save(preparedAdmin);
         } else {
             System.out.println("Admin with ID " + admin.getId() + " does not exist.");
             return null;
@@ -82,11 +69,38 @@ public class AdminService implements IAdminService {
     public String verify(Admin admin) {
         Optional<Admin> foundAdmin = repository.findByEmail(admin.getEmail());
 
+        if (foundAdmin != null && passwordEncoder.matches(admin.getPassword(), foundAdmin.getPassword())) {
         if (foundAdmin != null && foundAdmin.getClass().equals(admin.getPassword())) {
             return "success";
         } else {
             return "fail";
         }
+    }
+
+    private Admin prepareAdmin(Admin admin) {
+        String encodedPassword = encodeIfNeeded(admin.getPassword());
+
+        return new Admin.Builder()
+                .setId(admin.getId())
+                .setFirstName(admin.getFirstName())
+                .setLastName(admin.getLastName())
+                .setEmail(admin.getEmail())
+                .setPassword(encodedPassword)
+                .setRole("ADMIN")
+                .build();
+    }
+
+    private String encodeIfNeeded(String candidate) {
+        if (candidate == null || candidate.isBlank()) {
+            return candidate;
+        }
+
+        String trimmed = candidate.trim();
+        if (trimmed.startsWith("$2a$") || trimmed.startsWith("$2b$") || trimmed.startsWith("$2y$")) {
+            return trimmed;
+        }
+
+        return passwordEncoder.encode(trimmed);
     }
 
 

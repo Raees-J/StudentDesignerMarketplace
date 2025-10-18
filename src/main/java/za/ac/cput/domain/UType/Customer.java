@@ -6,13 +6,18 @@
 
 package za.ac.cput.domain.UType;
 
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import za.ac.cput.domain.User;
 
 @Entity
-@PrimaryKeyJoinColumn(name = "userId")
-public class Customer extends User {
+@PrimaryKeyJoinColumn(
+        name = "user_id",
+        referencedColumnName = "user_id",
+        foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)
+)public class Customer extends User {
 
     private String paymentMethod;
     private double amount;
