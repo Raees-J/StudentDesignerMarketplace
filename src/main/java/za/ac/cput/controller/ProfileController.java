@@ -1,7 +1,9 @@
 package za.ac.cput.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import za.ac.cput.domain.UType.Customer;
 import za.ac.cput.service.CustomerService;
 
@@ -22,14 +27,25 @@ public class ProfileController {
 
     private final CustomerService customerService;
 
-    @Autowired
     public ProfileController(CustomerService customerService) {
         this.customerService = customerService;
     }
 
     @GetMapping
-    public ResponseEntity<?> getProfile(@RequestParam String email) {
+    public ResponseEntity<?> getProfile(@RequestParam @Email @NotBlank String email) {
         try {
+            // Get authenticated user for security check
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).build();
+            }
+            
+            // Only allow users to access their own profile
+            String authenticatedEmail = authentication.getName();
+            if (!email.equals(authenticatedEmail)) {
+                return ResponseEntity.status(403).build();
+            }
+            
             // Find customer by email since we don't have direct profile system
             Customer customer = customerService.findByEmail(email);
             if (customer == null) {
@@ -54,8 +70,20 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateProfile(@RequestParam String email, @RequestBody ProfileRequest profileData) {
+    public ResponseEntity<?> updateProfile(@RequestParam @Email @NotBlank String email, @RequestBody @Valid ProfileRequest profileData) {
         try {
+            // Get authenticated user for security check
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).build();
+            }
+            
+            // Only allow users to update their own profile
+            String authenticatedEmail = authentication.getName();
+            if (!email.equals(authenticatedEmail)) {
+                return ResponseEntity.status(403).build();
+            }
+            
             Customer customer = customerService.findByEmail(email);
             if (customer == null) {
                 return ResponseEntity.notFound().build();
@@ -84,8 +112,20 @@ public class ProfileController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestParam String email, @RequestBody PasswordChangeRequest request) {
+    public ResponseEntity<?> changePassword(@RequestParam @Email @NotBlank String email, @RequestBody @Valid PasswordChangeRequest request) {
         try {
+            // Get authenticated user for security check
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).build();
+            }
+            
+            // Only allow users to change their own password
+            String authenticatedEmail = authentication.getName();
+            if (!email.equals(authenticatedEmail)) {
+                return ResponseEntity.status(403).build();
+            }
+            
             Customer customer = customerService.findByEmail(email);
             if (customer == null) {
                 return ResponseEntity.notFound().build();
@@ -111,8 +151,20 @@ public class ProfileController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteAccount(@RequestParam String email) {
+    public ResponseEntity<?> deleteAccount(@RequestParam @Email @NotBlank String email) {
         try {
+            // Get authenticated user for security check
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).build();
+            }
+            
+            // Only allow users to delete their own account
+            String authenticatedEmail = authentication.getName();
+            if (!email.equals(authenticatedEmail)) {
+                return ResponseEntity.status(403).build();
+            }
+            
             Customer customer = customerService.findByEmail(email);
             if (customer == null) {
                 return ResponseEntity.notFound().build();
