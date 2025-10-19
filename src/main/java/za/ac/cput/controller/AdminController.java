@@ -40,6 +40,12 @@ public class AdminController {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+
+    @Autowired
+    public AdminController(AdminService adminService, AdminRepository adminRepository, PasswordEncoder passwordEncoder) {
+        this.adminService = adminService;
+        this.adminRepository = adminRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -100,6 +106,24 @@ public class AdminController {
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
             response.put("admin", createAdminResponse(matched));
+            Admin foundAdmin = adminRepository.findByEmail(loginInput.getEmail().trim().toLowerCase());
+
+            if (foundAdmin == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email not found");
+            }
+
+            if (!passwordEncoder.matches(loginInput.getPassword(), foundAdmin.getPassword())) {
+
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
+            }
+
+            AdminLoginDTO dto = new AdminLoginDTO(
+                    foundAdmin.getId(),
+                    foundAdmin.getFirstName(),
+                    foundAdmin.getLastName(),
+                    foundAdmin.getEmail(),
+                    foundAdmin.getRole()
+            );
 
             return ResponseEntity.ok(response);
 

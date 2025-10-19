@@ -13,4 +13,5 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     List<Customer> findByPaymentMethod(String paymentMethod);
     Customer findByEmailAndPassword(String email, String password);
     Customer findByEmail(String email);
+    Customer findByEmailIgnoreCase(String email);
 }

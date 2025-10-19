@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import toast from 'react-hot-toast';
+import { useNotification } from '../contexts/NotificationContext';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -17,8 +17,9 @@ const Register: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { register, loading } = useAuth();
   const navigate = useNavigate();
+    const { showError } = useNotification();
 
-  const validateForm = () => {
+    const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.firstName) newErrors.firstName = 'First name is required';
@@ -65,7 +66,7 @@ const Register: React.FC = () => {
         navigate('/'); // redirect after registration
       }
     } catch (error) {
-      toast.error('Registration failed. Please try again.');
+        showError('Registration failed. Please try again.');
     }
   };
 

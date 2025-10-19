@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -24,55 +24,32 @@ import About from './pages/About';
 const App: React.FC = () => {
     return (
         <Router>
-            <AuthProvider>
-                <CartProvider>
-                    <div style={{
-                        minHeight: '100vh',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        backgroundColor: '#f9fafb'
-                    }}>
-                        <Toaster
-                            position="top-right"
-                            toastOptions={{
-                                duration: 4000,
-                                style: {
-                                    background: '#363636',
-                                    color: '#fff',
-                                },
-                                success: {
-                                    duration: 3000,
-                                    iconTheme: {
-                                        primary: '#4ade80',
-                                        secondary: '#fff',
-                                    },
-                                },
-                                error: {
-                                    duration: 4000,
-                                    iconTheme: {
-                                        primary: '#ef4444',
-                                        secondary: '#fff',
-                                    },
-                                },
+            <NotificationProvider>
+                <AuthProvider>
+                    <CartProvider>
+                        <div
+                            style={{
+                                minHeight: '100vh',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                backgroundColor: '#f9fafb'
                             }}
-                        />
-
-                        <Routes>
-                            {/* Admin Routes - No Header/Footer */}
-                            <Route
-                                path="/admin/dashboard"
-                                element={
-                                    <ProtectedAdminRoute>
-                                        <AdminDashboard />
-                                    </ProtectedAdminRoute>
-                                }
-                            />
-
-                            {/* Public Routes with Header/Footer */}
-                            <Route
-                                path="/*"
-                                element={
-                                    <>
+                        >
+                            <Routes>
+                                {/* Admin Routes - No Header/Footer */}
+                                <Route
+                                    path="/admin/dashboard"
+                                    element={
+                                        <ProtectedAdminRoute>
+                                            <AdminDashboard />
+                                        </ProtectedAdminRoute>
+                                    }
+                                />
+                                {/* Public Routes with Header/Footer */}
+                                <Route
+                                    path="/*"
+                                    element={
+                                        <>
                                         <Header />
                                         <main style={{ flex: 1 }}>
                                             <Routes>
@@ -85,30 +62,19 @@ const App: React.FC = () => {
                                                 <Route path="/login" element={<Login />} />
                                                 <Route path="/register" element={<Register />} />
 
-                                                {/* Protected Routes */}
-                                                <Route path="/checkout" element={
-                                                    <ProtectedRoute>
-                                                        <Checkout />
-                                                    </ProtectedRoute>
-                                                } />
-                                                <Route path="/profile" element={
-                                                    <ProtectedRoute>
-                                                        <Profile />
-                                                    </ProtectedRoute>
-                                                } />
-
                                                 {/* Catch all - redirect to home */}
                                                 <Route path="*" element={<Navigate to="/" replace />} />
                                             </Routes>
                                         </main>
-                                        <Footer />
-                                    </>
-                                }
-                            />
-                        </Routes>
-                    </div>
-                </CartProvider>
-            </AuthProvider>
+                                            <Footer />
+                                        </>
+                                    }
+                                />
+                            </Routes>
+                        </div>
+                    </CartProvider>
+                </AuthProvider>
+            </NotificationProvider>
         </Router>
     );
 };

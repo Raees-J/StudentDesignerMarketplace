@@ -2,6 +2,8 @@ package za.ac.cput.controller;
 import java.util.List;
 import java.util.UUID;
 
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +22,12 @@ import jakarta.validation.constraints.NotBlank;
 import za.ac.cput.domain.UType.Customer;
 import za.ac.cput.service.CustomerService;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/customer")
 public class CustomerController {
     private final CustomerService customerService;
@@ -34,6 +41,18 @@ public class CustomerController {
     public ResponseEntity<Customer> create(@RequestBody @Valid Customer customer) {
         Customer createdCustomer = customerService.create(customer);
         return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+    public ResponseEntity<?> create(@RequestBody Customer customer) {
+        try {
+            Customer createdCustomer = customerService.create(customer);
+            if (createdCustomer == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Invalid customer data"));
+            }
+            return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
 
     @GetMapping("/read/{id}")
@@ -52,8 +71,17 @@ public class CustomerController {
         Customer updatedCustomer = customerService.update(customer);
         if (updatedCustomer != null) {
             return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
+    public ResponseEntity<?> update(@RequestBody Customer customer) {
+        try {
+            Customer updatedCustomer = customerService.update(customer);
+            if (updatedCustomer != null) {
+                return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", e.getMessage()));
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/delete/{id}")

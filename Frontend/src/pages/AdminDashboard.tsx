@@ -19,13 +19,13 @@ import {
     X
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { Admin, deleteAdmin, getAllAdmins, registerAdmin, updateAdmin } from '../api/adminService';
 import { getAllOrders } from '../api/orderService';
 import { createProduct, deleteProduct, getAllProducts, updateProduct } from '../api/productService';
 import { getAllCustomers } from '../api/profileApi';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext';
 import { categories, Product } from '../data/products';
 
 interface DashboardStats {
@@ -51,6 +51,7 @@ interface Customer {
 
 const AdminDashboard: React.FC = () => {
     const { currentUser, logout, role } = useAuth();
+    const { showError, showSuccess } = useNotification();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'overview' | 'customers' | 'products' | 'orders' | 'admins'>('overview');
     const [viewMode, setViewMode] = useState<'list' | 'view' | 'edit' | 'create'>('list');
@@ -139,7 +140,7 @@ const AdminDashboard: React.FC = () => {
                     });
                 } catch (error) {
                     console.error('Error loading dashboard data:', error);
-                    toast.error('Failed to load dashboard data');
+                    showError('Failed to load dashboard data');
                 } finally {
                     setLoading(false);
                 }
@@ -187,10 +188,10 @@ const AdminDashboard: React.FC = () => {
                     : order
             );
             setOrders(updatedOrders);
-            toast.success(`Order status updated to ${newStatus}`);
+            showSuccess(`Order status updated to ${newStatus}`);
         } catch (error) {
             console.error('Error updating order status:', error);
-            toast.error('Failed to update order status');
+            showError('Failed to update order status');
         }
     };
 
@@ -203,9 +204,9 @@ const AdminDashboard: React.FC = () => {
                 await deleteAdmin(item.id);
                 setAdmins(admins.filter(a => a.id !== item.id));
             }
-            toast.success('Deleted successfully!');
+            showSuccess('Deleted successfully!');
         } catch (error) {
-            toast.error('Failed to delete');
+            showError('Failed to delete');
         }
     };
 
@@ -790,16 +791,16 @@ const AdminDashboard: React.FC = () => {
                 if (viewMode === 'create') {
                     const created = await createProduct(formData);
                     setProducts([...products, created]);
-                    toast.success('Product created successfully!');
+                    showSuccess('Product created successfully!');
                 } else {
                     const updated = await updateProduct({ ...formData, id: selectedItem.id });
                     setProducts(products.map(p => p.id === updated.id ? updated : p));
-                    toast.success('Product updated successfully!');
+                    showSuccess('Product updated successfully!');
                 }
                 setViewMode('list');
             } catch (err) {
                 console.error('Error saving product:', err);
-                toast.error('Failed to save product. Check console for details.');
+                showError('Failed to save product. Check console for details.');
             }
         };
 
@@ -998,7 +999,7 @@ const AdminDashboard: React.FC = () => {
                 if (viewMode === 'create') {
                     const newAdmin = await registerAdmin(formData);
                     updatedAdmins = [...admins, newAdmin];
-                    toast.success('Admin created successfully!');
+                    showSuccess('Admin created successfully!');
                 } else {
                     // Explicitly type updateData as Admin
                     const updateData: Admin = { id: selectedItem.id, ...formData };
@@ -1007,14 +1008,14 @@ const AdminDashboard: React.FC = () => {
                     }
                     const updated = await updateAdmin(updateData);
                     updatedAdmins = admins.map(a => a.id === updated.id ? updated : a);
-                    toast.success('Admin updated successfully!');
+                    showSuccess('Admin updated successfully!');
                 }
                 setAdmins(updatedAdmins);
                 setViewMode('list');
                 setSelectedItem(null);
             } catch (err) {
                 console.error('Error saving admin:', err);
-                toast.error('Failed to save admin. Check console for details.');
+                showError('Failed to save admin. Check console for details.');
             }
         };
 

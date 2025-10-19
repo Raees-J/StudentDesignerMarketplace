@@ -1,16 +1,17 @@
 import { ArrowLeft, Heart, RotateCcw, Share2, Shield, ShoppingCart, Star, Truck } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
 import { Link, useParams } from 'react-router-dom'
 import { getAllProducts } from '../api/productService'
 import { getProductReviews, Review } from '../api/reviewService'
 import ReviewSection from '../components/ReviewSection'
 import { useCart } from '../contexts/CartContext'
+import { useNotification } from '../contexts/NotificationContext'
 import { products } from '../data/products'
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams()
   const { addItem } = useCart()
+  const { showError, showSuccess } = useNotification()
   const [selectedSize, setSelectedSize] = useState('')
   const [selectedColor, setSelectedColor] = useState('')
   const [quantity, setQuantity] = useState(1)
@@ -101,11 +102,11 @@ const ProductDetail: React.FC = () => {
 
   const handleAddToCart = () => {
     if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-      toast.error('Please select a size')
+      showError('Please select a size')
       return
     }
     if (product.colors && product.colors.length > 0 && !selectedColor) {
-      toast.error('Please select a color')
+      showError('Please select a color')
       return
     }
 
@@ -118,7 +119,7 @@ const ProductDetail: React.FC = () => {
       color: selectedColor
     })
 
-    toast.success('Added to cart!')
+    showSuccess('Added to cart!')
   }
 
   const renderStars = (rating: number) => {
