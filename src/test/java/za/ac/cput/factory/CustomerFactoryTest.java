@@ -1,7 +1,9 @@
 package za.ac.cput.factory;
-import org.junit.jupiter.api.Test;
-import za.ac.cput.domain.UType.Customer;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+import za.ac.cput.domain.UType.Customer;
 
 class CustomerFactoryTest {
     @Test
@@ -21,6 +23,11 @@ class CustomerFactoryTest {
         assertNotNull(customer3);
         assertEquals("Online", customer3.getPaymentMethod());
         assertEquals(299.99, customer3.getAmount());
+        // Test case 4: Valid payment method "EFT"
+        Customer customer4 = CustomerFactory.createCustomer("bob@example.com", "pass012", "EFT", 175.50);
+        assertNotNull(customer4);
+        assertEquals("EFT", customer4.getPaymentMethod());
+        assertEquals(175.50, customer4.getAmount());
     }
 
     @Test
@@ -29,16 +36,16 @@ class CustomerFactoryTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             CustomerFactory.createCustomer("test@example.com", "pass000", "Bitcoin", 100.00);
         });
-        assertEquals("Invalid payment method. Allowed: Card, Cash, Online.", exception.getMessage());
+        assertEquals("Invalid payment method. Allowed: Card, Cash, EFT, Online.", exception.getMessage());
         // Test case 5: Null payment method
         IllegalArgumentException exception2 = assertThrows(IllegalArgumentException.class, () -> {
             CustomerFactory.createCustomer("test2@example.com", "pass111", null, 75.00);
         });
-        assertEquals("Invalid payment method. Allowed: Card, Cash, Online.", exception2.getMessage());
+        assertEquals("Invalid payment method. Allowed: Card, Cash, EFT, Online.", exception2.getMessage());
         // Test case 6: Empty payment method
         IllegalArgumentException exception3 = assertThrows(IllegalArgumentException.class, () -> {
             CustomerFactory.createCustomer("test3@example.com", "pass222", "", 200.00);
         });
-        assertEquals("Invalid payment method. Allowed: Card, Cash, Online.", exception3.getMessage());
+        assertEquals("Invalid payment method. Allowed: Card, Cash, EFT, Online.", exception3.getMessage());
     }
 }

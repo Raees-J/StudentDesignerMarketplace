@@ -1,12 +1,12 @@
 import { Star } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import {
-    createReview,
-    getProductReviews,
-    getProductReviewStats,
-    NewReview,
-    Review,
-    ReviewStats
+  createReview,
+  getProductReviews,
+  getProductReviewStats,
+  NewReview,
+  Review,
+  ReviewStats
 } from '../api/reviewService'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -22,6 +22,11 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ productId }) => {
     totalReviews: 0,
     ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
   })
+  
+  // Debug logging
+  console.log('ReviewSection rendered with:')
+  console.log('- productId:', productId)
+  console.log('- currentUser:', currentUser)
   const [loading, setLoading] = useState(true)
   const [showAddReview, setShowAddReview] = useState(false)
   const [newReview, setNewReview] = useState({
@@ -53,10 +58,26 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ productId }) => {
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!currentUser || submitting) return
+    
+    console.log('Submit review clicked!')
+    console.log('Current user:', currentUser)
+    console.log('Submitting state:', submitting)
+    console.log('New review data:', newReview)
+    
+    if (!currentUser) {
+      console.log('No current user - aborting submission')
+      alert('Please log in to submit a review')
+      return
+    }
+    
+    if (submitting) {
+      console.log('Already submitting - aborting')
+      return
+    }
 
     try {
       setSubmitting(true)
+      console.log('Starting review submission...')
       const reviewData: NewReview = {
         productID: productId,
         customerID: currentUser.id?.toString() || 'anonymous',
@@ -64,7 +85,11 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ productId }) => {
         comment: newReview.comment
       }
 
+      console.log('Calling API with review data:', reviewData)
       await createReview(reviewData)
+      
+      console.log('Review submitted successfully!')
+      alert('Review submitted successfully!')
       
       // Reset form and reload reviews
       setNewReview({ rating: 5, comment: '' })
@@ -73,8 +98,10 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ productId }) => {
       
     } catch (error) {
       console.error('Error submitting review:', error)
+      alert(`Failed to submit review: ${error}`)
     } finally {
       setSubmitting(false)
+      console.log('Submission complete, resetting submitting state')
     }
   }
 
@@ -305,6 +332,12 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ productId }) => {
               <button
                 type="submit"
                 disabled={submitting || !newReview.comment.trim()}
+                onClick={() => {
+                  console.log('Submit button clicked!')
+                  console.log('Button disabled?', submitting || !newReview.comment.trim())
+                  console.log('Comment text:', newReview.comment)
+                  console.log('Comment trimmed:', newReview.comment.trim())
+                }}
                 style={{
                   padding: '0.75rem 1.5rem',
                   backgroundColor: submitting || !newReview.comment.trim() ? '#9ca3af' : '#10b981',

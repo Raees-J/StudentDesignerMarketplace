@@ -1,8 +1,12 @@
 package za.ac.cput.service;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import za.ac.cput.domain.UType.Customer;
 import za.ac.cput.domain.User;
 import za.ac.cput.repository.CustomerRepository;
@@ -131,5 +135,10 @@ public class CustomerService implements ICustomerService {
         }
 
         return passwordEncoder.encode(trimmed);
+    }
+
+    @Override
+    public Customer findByEmail(String email) {
+        return repository.findByEmail(email);
     }
 }

@@ -6,7 +6,7 @@ import za.ac.cput.util.Helper;
 public class CustomerFactory {
     public static Customer createCustomer(String firstName, String lastName, String email, String password, String paymentMethod, double amount) {
         if (!Helper.isValidPaymentMethod(paymentMethod)) {
-            throw new IllegalArgumentException("Invalid payment method. Allowed: Card, Cash, Online.");
+            throw new IllegalArgumentException("Invalid payment method. Allowed: Card, Cash, EFT, Online.");
         }
         return new Customer.Builder()
                 .setFirstName(firstName)

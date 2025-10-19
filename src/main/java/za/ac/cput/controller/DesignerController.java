@@ -1,25 +1,34 @@
 package za.ac.cput.controller;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import za.ac.cput.domain.UType.Designer;
-import za.ac.cput.service.DesignerService;
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
+import za.ac.cput.domain.UType.Designer;
+import za.ac.cput.service.DesignerService;
 
 @RestController
 @RequestMapping("/designer")
 public class DesignerController {
     private final DesignerService designerService;
 
-    @Autowired
     public DesignerController(DesignerService designerService) {
         this.designerService = designerService;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Designer> create(@RequestBody Designer designer) {
+    public ResponseEntity<Designer> create(@RequestBody @Valid Designer designer) {
         Designer createdDesigner = designerService.create(designer);
         return new ResponseEntity<>(createdDesigner, HttpStatus.CREATED);
     }
@@ -34,7 +43,7 @@ public class DesignerController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Designer> update(@RequestBody Designer designer) {
+    public ResponseEntity<Designer> update(@RequestBody @Valid Designer designer) {
         Designer updatedDesigner = designerService.update(designer);
         if (updatedDesigner != null) {
             return new ResponseEntity<>(updatedDesigner, HttpStatus.OK);

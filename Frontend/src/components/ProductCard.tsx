@@ -391,7 +391,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               borderTop: '1px solid #f1f5f9'
             }}>
               <Link
-                to={`/product/${product.id}#reviews`}
+                to={`/products/${product.id}#reviews`}
                 onClick={() => setShowModal(false)}
                 style={{
                   flex: '1',

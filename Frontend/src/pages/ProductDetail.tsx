@@ -55,6 +55,20 @@ const ProductDetail: React.FC = () => {
     fetchReviews()
   }, [id])
 
+  // Handle scrolling to reviews section when URL contains #reviews
+  useEffect(() => {
+    if (window.location.hash === '#reviews') {
+      // Wait for the component to fully render
+      setTimeout(() => {
+        const reviewsSection = document.getElementById('reviews')
+        if (reviewsSection) {
+          reviewsSection.scrollIntoView({ behavior: 'smooth' })
+          setActiveTab('reviews') // Switch to reviews tab
+        }
+      }, 100)
+    }
+  }, [id, loading, reviewsLoading])
+
   const product = allProducts.find(p => p.id === id)
 
   // Calculate average rating from reviews
@@ -412,7 +426,9 @@ const ProductDetail: React.FC = () => {
             )}
 
             {activeTab === 'reviews' && (
-                <ReviewSection productId={product.id} />
+                <div id="reviews">
+                  <ReviewSection productId={product.id} />
+                </div>
             )}
           </div>
         </div>

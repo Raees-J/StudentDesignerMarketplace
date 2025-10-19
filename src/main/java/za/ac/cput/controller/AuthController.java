@@ -1,24 +1,30 @@
 package za.ac.cput.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import za.ac.cput.domain.Admin;
 import za.ac.cput.domain.User;
 import za.ac.cput.repository.AdminRepository;
 import za.ac.cput.repository.UserRepository;
 import za.ac.cput.service.AuthService;
 import za.ac.cput.util.JwtUtil;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/**")
+@RequestMapping("/auth")
 @CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
@@ -40,16 +46,17 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
+            // Authenticate using email (not username)
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
 
-            String token = jwtUtil.generateToken(request.getUsername());
-
             // Check User table first
-            Optional<User> userOpt = userRepository.findByEmail(request.getUsername());
+            Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
+                String token = jwtUtil.generateToken(user.getEmail(), user.getRole(), user.getUserId());
+
                 Map<String, Object> response = new HashMap<>();
                 response.put("token", token);
                 response.put("user", createUserResponse(user));
@@ -57,20 +64,22 @@ public class AuthController {
             }
 
             // Check Admin table
-            Optional<Admin> adminOpt = adminRepository.findByEmail(request.getUsername());
+            Optional<Admin> adminOpt = adminRepository.findByEmail(request.getEmail());
             if (adminOpt.isPresent()) {
                 Admin admin = adminOpt.get();
+                String token = jwtUtil.generateToken(admin.getEmail(), admin.getRole(), admin.getId());
+
                 Map<String, Object> response = new HashMap<>();
                 response.put("token", token);
                 response.put("user", createAdminResponse(admin));
                 return ResponseEntity.ok(response);
             }
 
-            return ResponseEntity.badRequest().body("User not found");
+            return ResponseEntity.status(404).body("User not found");
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("message", "Invalid credentials");
-            return ResponseEntity.badRequest().body(error);
+            return ResponseEntity.status(401).body(error);
         }
     }
 
@@ -81,17 +90,19 @@ public class AuthController {
                     request.getEmail(),
                     request.getPassword(),
                     request.getRole()
+
             );
 
-            String token = jwtUtil.generateToken(request.getEmail());
-
             Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
 
-            if (registeredUser instanceof User) {
-                response.put("user", createUserResponse((User) registeredUser));
-            } else if (registeredUser instanceof Admin) {
-                response.put("user", createAdminResponse((Admin) registeredUser));
+            if (registeredUser instanceof User user) {
+                String token = jwtUtil.generateToken(user.getEmail(), user.getRole(), user.getUserId());
+                response.put("token", token);
+                response.put("user", createUserResponse(user));
+            } else if (registeredUser instanceof Admin admin) {
+                String token = jwtUtil.generateToken(admin.getEmail(), admin.getRole(), admin.getId());
+                response.put("token", token);
+                response.put("user", createAdminResponse(admin));
             }
 
             return ResponseEntity.ok(response);
@@ -125,7 +136,6 @@ public class AuthController {
     private Map<String, Object> createUserResponse(User user) {
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("id", user.getUserId().toString());
-        userMap.put("username", user.getEmail());
         userMap.put("email", user.getEmail());
         userMap.put("role", user.getRole());
         return userMap;
@@ -134,7 +144,6 @@ public class AuthController {
     private Map<String, Object> createAdminResponse(Admin admin) {
         Map<String, Object> adminMap = new HashMap<>();
         adminMap.put("id", admin.getId().toString());
-        adminMap.put("username", admin.getEmail());
         adminMap.put("email", admin.getEmail());
         adminMap.put("role", admin.getRole());
         adminMap.put("firstName", admin.getFirstName());
@@ -142,24 +151,22 @@ public class AuthController {
         return adminMap;
     }
 
+    // Updated LoginRequest class
     static class LoginRequest {
-        private String username;
+        private String email;
         private String password;
 
-        public String getUsername() { return username; }
-        public void setUsername(String username) { this.username = username; }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
         public String getPassword() { return password; }
         public void setPassword(String password) { this.password = password; }
     }
 
     static class RegisterRequest {
-        private String username;
         private String email;
         private String password;
         private String role;
 
-        public String getUsername() { return username; }
-        public void setUsername(String username) { this.username = username; }
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
         public String getPassword() { return password; }

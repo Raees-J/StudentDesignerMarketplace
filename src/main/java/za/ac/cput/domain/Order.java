@@ -1,9 +1,10 @@
 package za.ac.cput.domain;
 
+import java.util.Objects;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.util.Objects;
 
 /**
  * Order entity capturing a purchase of a product by a customer.
@@ -17,6 +18,8 @@ public class Order {
     private String customerID;
     private int quantity;
     private double total;
+    private String paymentMethod;
+    private String paymentStatus;
 
     protected Order(){}
 
@@ -26,6 +29,8 @@ public class Order {
         this.customerID = builder.customerID;
         this.quantity = builder.quantity;
         this.total = builder.total;
+        this.paymentMethod = builder.paymentMethod;
+        this.paymentStatus = builder.paymentStatus;
     }
 
     public String getOrderID(){return orderID;}
@@ -33,6 +38,8 @@ public class Order {
     public String getCustomerID(){return customerID;}
     public int getQuantity(){return quantity;}
     public double getTotal(){return total;}
+    public String getPaymentMethod(){return paymentMethod;}
+    public String getPaymentStatus(){return paymentStatus;}
 
     @Override
     public boolean equals(Object o){
@@ -42,12 +49,14 @@ public class Order {
         return quantity==order.quantity && Double.compare(order.total,total)==0 &&
                 Objects.equals(orderID, order.orderID) &&
                 Objects.equals(productID, order.productID) &&
-                Objects.equals(customerID, order.customerID);
+                Objects.equals(customerID, order.customerID) &&
+                Objects.equals(paymentMethod, order.paymentMethod) &&
+                Objects.equals(paymentStatus, order.paymentStatus);
     }
 
     @Override
     public int hashCode(){
-        return Objects.hash(orderID, productID, customerID, quantity, total);
+        return Objects.hash(orderID, productID, customerID, quantity, total, paymentMethod, paymentStatus);
     }
 
     @Override
@@ -58,6 +67,8 @@ public class Order {
                 ", customerID='" + customerID + '\'' +
                 ", quantity=" + quantity +
                 ", total=" + total +
+                ", paymentMethod='" + paymentMethod + '\'' +
+                ", paymentStatus='" + paymentStatus + '\'' +
                 '}';
     }
 
@@ -67,12 +78,16 @@ public class Order {
         private String customerID;
         private int quantity;
         private double total;
+        private String paymentMethod;
+        private String paymentStatus;
 
         public Builder setOrderID(String orderID){this.orderID=orderID;return this;}
         public Builder setProductID(String productID){this.productID=productID;return this;}
         public Builder setCustomerID(String customerID){this.customerID=customerID;return this;}
         public Builder setQuantity(int quantity){this.quantity=quantity;return this;}
         public Builder setTotal(double total){this.total=total;return this;}
+        public Builder setPaymentMethod(String paymentMethod){this.paymentMethod=paymentMethod;return this;}
+        public Builder setPaymentStatus(String paymentStatus){this.paymentStatus=paymentStatus;return this;}
 
         public Builder copy(Order order){
             this.orderID=order.orderID;
@@ -80,6 +95,8 @@ public class Order {
             this.customerID=order.customerID;
             this.quantity=order.quantity;
             this.total=order.total;
+            this.paymentMethod=order.paymentMethod;
+            this.paymentStatus=order.paymentStatus;
             return this;
         }
 

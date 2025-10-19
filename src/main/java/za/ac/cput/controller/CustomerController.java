@@ -1,9 +1,24 @@
 package za.ac.cput.controller;
+import java.util.List;
+import java.util.UUID;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import za.ac.cput.domain.UType.Customer;
 import za.ac.cput.service.CustomerService;
 
@@ -17,11 +32,15 @@ import java.util.UUID;
 public class CustomerController {
     private final CustomerService customerService;
 
-    @Autowired
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
+
     @PostMapping("/create")
+    // Public endpoint for registration - no @PreAuthorize needed
+    public ResponseEntity<Customer> create(@RequestBody @Valid Customer customer) {
+        Customer createdCustomer = customerService.create(customer);
+        return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
     public ResponseEntity<?> create(@RequestBody Customer customer) {
         try {
             Customer createdCustomer = customerService.create(customer);
@@ -37,6 +56,7 @@ public class CustomerController {
     }
 
     @GetMapping("/read/{id}")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
     public ResponseEntity<Customer> read(@PathVariable UUID id) {
         Customer customer = customerService.read(id);
         if (customer != null) {
@@ -46,6 +66,11 @@ public class CustomerController {
     }
 
     @PutMapping("/update")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
+    public ResponseEntity<Customer> update(@RequestBody @Valid Customer customer) {
+        Customer updatedCustomer = customerService.update(customer);
+        if (updatedCustomer != null) {
+            return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
     public ResponseEntity<?> update(@RequestBody Customer customer) {
         try {
             Customer updatedCustomer = customerService.update(customer);
@@ -60,6 +85,7 @@ public class CustomerController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         boolean deleted = customerService.delete(id);
         if (deleted) {
@@ -69,19 +95,22 @@ public class CustomerController {
     }
 
     @GetMapping("/getAll")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Customer>> getAll() {
         List<Customer> customers = customerService.getAll();
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
     @GetMapping("/findByPaymentMethod")
-    public ResponseEntity<List<Customer>> findByPaymentMethod(@RequestParam String paymentMethod) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Customer>> findByPaymentMethod(@RequestParam @NotBlank String paymentMethod) {
         List<Customer> customers = customerService.findByPaymentMethod(paymentMethod);
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Customer> login(@RequestBody Customer loginRequest) {
+    // Public endpoint for login - no @PreAuthorize needed
+    public ResponseEntity<Customer> login(@RequestBody @Valid Customer loginRequest) {
         Customer customer = customerService.login(loginRequest.getEmail(), loginRequest.getPassword());
         if (customer != null) {
             return new ResponseEntity<>(customer, HttpStatus.OK);

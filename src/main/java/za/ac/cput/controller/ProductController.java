@@ -2,9 +2,9 @@ package za.ac.cput.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import za.ac.cput.domain.Product;
 import za.ac.cput.factory.ProductFactory;
 import za.ac.cput.repository.ProductRepository;
@@ -27,14 +29,14 @@ public class ProductController {
     private final ProductService productService;
     private final ProductRepository productRepository;
 
-    @Autowired
     public ProductController(ProductService productService, ProductRepository productRepository){
         this.productService = productService;
         this.productRepository = productRepository;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody Product productInput){
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> create(@RequestBody @Valid Product productInput){
         try {
             Product newProduct;
             
@@ -83,20 +85,10 @@ public class ProductController {
                 .body("Error creating product: " + e.getMessage());
         }
     }
-    // Test endpoint for testProduct
-    @GetMapping("/testProduct")
-    public Product testProduct() {
-        return ProductFactory.buildProduct(
-                "Test Product",
-                "Test Description",
-                123.45,
-                "/assets/images/test.jpg",
-                "test-category"
-        );
-    }
+
 
     @GetMapping("/read/{id}")
-    public ResponseEntity<Product> read(@PathVariable String id){
+    public ResponseEntity<Product> read(@PathVariable @NotBlank String id){
         Product product = productService.read(id);
         if(product == null){
             return ResponseEntity.notFound().build();
@@ -105,7 +97,8 @@ public class ProductController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Product> update(@RequestBody Product product){
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Product> update(@RequestBody @Valid Product product){
         Product updated = productService.update(product);
         if(updated == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -114,12 +107,14 @@ public class ProductController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id){
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> delete(@PathVariable @NotBlank String id){
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<Product> getAll(){
         return productService.getAll();
     }
