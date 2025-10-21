@@ -76,9 +76,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     
     // Create multiple views of the same product image for thumbnail effect
     const productImages = [
-      product.image,
-      product.image,
-      product.image,
       product.image
     ]
 
