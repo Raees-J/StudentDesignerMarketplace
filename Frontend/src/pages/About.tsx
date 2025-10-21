@@ -7,39 +7,32 @@ import React from 'react';
 
 const initialTeam = [
   {
-    name: 'Alex Thompson',
-    role: 'Lead Frontend Developer',
-    desc: 'Specializes in React, TypeScript, and modern web frameworks. Alex leads our frontend team in creating exceptional user experiences.',
-    image: '',
-    sample: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg',
+    name: 'Raees',
+    role: 'Lead Developer',
+    desc: 'Passionate full-stack developer with expertise in modern web technologies. Raees leads the development team in creating innovative solutions for the student designer marketplace.',
+    image: '/assets/images/Raees.jpeg',
+    sample: '/assets/images/Raees.jpeg',
   },
   {
-    name: 'Maya Patel',
-    role: 'UI/UX Designer',
-    desc: 'Creative designer with expertise in user interface design and user experience optimization. Maya ensures our websites are both beautiful and functional.',
-    image: '',
-    sample: 'https://images.pexels.com/photos/1438081/pexels-photo-1438081.jpeg',
+    name: 'Ethan',
+    role: 'Frontend Developer',
+    desc: 'Creative frontend developer specializing in React and user interface design. Ethan focuses on delivering exceptional user experiences and responsive web applications.',
+    image: '/assets/images/Ethan.jpeg',
+    sample: '/assets/images/Ethan.jpeg',
   },
   {
-    name: 'David Chen',
+    name: 'Justin',
     role: 'Backend Developer',
-    desc: 'Expert in Node.js, databases, and server architecture. David builds robust and scalable backend systems that power our web applications.',
-    image: '',
-    sample: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg',
+    desc: 'Expert backend developer with strong skills in server-side technologies and database management. Justin ensures robust and scalable system architecture.',
+    image: '/assets/images/Justin.jpeg',
+    sample: '/assets/images/Justin.jpeg',
   },
   {
-    name: 'Sarah Williams',
+    name: 'Aristide',
     role: 'Full Stack Developer',
-    desc: 'Versatile developer proficient in both frontend and backend technologies. Sarah bridges the gap between design and functionality.',
-    image: '',
-    sample: 'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg',
-  },
-  {
-    name: 'Marcus Johnson',
-    role: 'DevOps Engineer',
-    desc: 'Manages our deployment pipelines, cloud infrastructure, and ensures our websites run smoothly and securely in production.',
-    image: '',
-    sample: 'https://images.pexels.com/photos/1484794/pexels-photo-1484794.jpeg',
+    desc: 'Versatile developer with experience in both frontend and backend development. Aristide contributes to all aspects of the application, ensuring seamless integration between components.',
+    image: '/assets/images/Aristide.jpeg',
+    sample: '/assets/images/Aristide.jpeg',
   },
 ];
 
@@ -210,7 +203,7 @@ const About: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5" style={{ gap: '2rem' }}>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4" style={{ gap: '2rem' }}>
           {team.map((member, idx) => (
             <Card key={member.name} sx={{ p: 2, textAlign: 'center', borderRadius: 3, boxShadow: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 370 }}>
               <div style={{
@@ -229,7 +222,12 @@ const About: React.FC = () => {
                 <img
                   src={member.image ? member.image : member.sample}
                   alt={member.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: member.name === 'Ethan' ? 'contain' : 'cover',
+                    objectPosition: member.name === 'Ethan' ? 'center' : 'center top'
+                  }}
                   onError={e => { e.currentTarget.src = member.sample; }}
                 />
               </div>
