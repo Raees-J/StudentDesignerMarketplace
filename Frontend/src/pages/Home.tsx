@@ -228,58 +228,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Newsletter Section */}
-      <section style={{
-        padding: '4rem 0',
-        background: 'linear-gradient(135deg, #1f2937 0%, #374151 100%)',
-        color: 'white'
-      }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              marginBottom: '1rem'
-            }}>
-              Stay Updated
-            </h2>
-            <p style={{
-              fontSize: '1.125rem',
-              marginBottom: '2rem',
-              opacity: 0.9
-            }}>
-              Subscribe to our newsletter for exclusive offers, new product launches, 
-              and university merchandise updates.
-            </p>
-            <div style={{
-              display: 'flex',
-              gap: '1rem',
-              maxWidth: '400px',
-              margin: '0 auto',
-              flexWrap: 'wrap'
-            }}>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="input"
-                style={{
-                  flex: 1,
-                  minWidth: '250px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: 'white'
-                }}
-              />
-              <button className="btn btn-primary" style={{
-                backgroundColor: '#3b82f6',
-                whiteSpace: 'nowrap'
-              }}>
-                Subscribe
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }
