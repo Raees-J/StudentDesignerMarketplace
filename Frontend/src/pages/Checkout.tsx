@@ -46,34 +46,45 @@ const Checkout: React.FC = () => {
     setLoading(true)
     try {
       if (!currentUser) throw new Error('User not logged in')
-      // Only allow single-item checkout for backend compatibility
-      if (items.length !== 1) {
-        toast.error('You can only checkout one item at a time. Please remove extra items from your cart.');
+      
+      // Create separate orders for each cart item to maintain backend compatibility
+      if (items.length === 0) {
+        toast.error('Your cart is empty. Please add items to checkout.');
         setLoading(false);
         return;
       }
-      const item = items[0];
-      const order = {
-        productID: item.id,
-        customerID: currentUser.id,
-        quantity: item.quantity,
-        total: item.price * item.quantity,
-        paymentMethod: formData.paymentMethod
-      };
-      await createOrder(order);
+
+      // Process each item in the cart as a separate order
+      const orderPromises = items.map(item => {
+        const order = {
+          productID: item.id,
+          customerID: currentUser.id,
+          quantity: item.quantity,
+          total: item.price * item.quantity,
+          paymentMethod: formData.paymentMethod
+        };
+        return createOrder(order);
+      });
+
+      // Wait for all orders to be created
+      await Promise.all(orderPromises);
       clearCart();
       
-      // Different success messages based on payment method
+      // Different success messages based on payment method and number of items
+      const itemCount = items.length;
+      const itemText = itemCount === 1 ? 'item' : 'items';
+      
       if (formData.paymentMethod === 'Cash') {
-        toast.success('Order placed! Check your email for collection details.');
+        toast.success(`${itemCount} ${itemText} ordered! Check your email for collection details.`);
       } else if (formData.paymentMethod === 'EFT') {
-        toast.success('Order placed! EFT payment details sent to your email.');
+        toast.success(`${itemCount} ${itemText} ordered! EFT payment details sent to your email.`);
       } else {
-        toast.success('Order placed successfully!');
+        toast.success(`${itemCount} ${itemText} ordered successfully!`);
       }
       
       navigate('/profile');
     } catch (error) {
+      console.error('Order creation error:', error);
       toast.error('Failed to process payment. Please try again.')
     } finally {
       setLoading(false)
