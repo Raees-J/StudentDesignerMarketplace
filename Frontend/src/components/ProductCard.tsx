@@ -556,37 +556,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           }}>
             {product.inStock ? 'In Stock' : 'Out of Stock'}
           </div>
-          {/* Wishlist Button */}
-          <button
-            style={{
-              position: 'absolute',
-              top: '1rem',
-              right: '1rem',
-              backgroundColor: 'rgba(255,255,255,0.95)',
-              border: 'none',
-              borderRadius: '50%',
-              width: '2.5rem',
-              height: '2.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
-              transition: 'all 0.2s',
-            }}
-            onMouseOver={e => {
-              e.currentTarget.style.backgroundColor = '#f1f5f9';
-              e.currentTarget.style.transform = 'scale(1.1)';
-            }}
-            onMouseOut={e => {
-              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.95)';
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
-            tabIndex={-1}
-            aria-label="Add to wishlist"
-          >
-            <Heart size={18} style={{ color: '#64748b' }} />
-          </button>
+          
         </div>
   {/* Content Section */}
   <div style={{ padding: '1.2rem 1rem 1rem 1rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '0.6rem' }}>
