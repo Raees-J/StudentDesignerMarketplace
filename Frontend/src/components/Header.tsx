@@ -349,6 +349,31 @@ const Header: React.FC = () => {
                                 Admin Dashboard
                               </Link>
                           )}
+                          {/* My Profile Link - Only show for customers (non-admin users) */}
+                          {role !== 'ADMIN' && (
+                              <Link
+                                  to="/profile"
+                                  onClick={() => setIsMenuOpen(false)}
+                                  style={{
+                                    display: 'block',
+                                    padding: '1rem 1.25rem',
+                                    textDecoration: 'none',
+                                    color: '#374151',
+                                    fontSize: '0.9rem',
+                                    fontWeight: '500',
+                                    borderBottom: '1px solid #f3f4f6',
+                                    transition: 'background-color 0.2s ease'
+                                  }}
+                                  onMouseOver={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#f8fafc'
+                                  }}
+                                  onMouseOut={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent'
+                                  }}
+                              >
+                                My Profile
+                              </Link>
+                          )}
                           <button
                               onClick={() => {
                                 handleLogout()
