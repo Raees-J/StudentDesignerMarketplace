@@ -34,6 +34,13 @@ const initialTeam = [
     image: '/assets/images/Aristide.jpeg',
     sample: '/assets/images/Aristide.jpeg',
   },
+  {
+    name: 'Anwil',
+    role: 'UI/UX Designer',
+    desc: 'Creative designer with a keen eye for user experience and interface design. Anwil focuses on creating intuitive and visually appealing designs that enhance the overall user journey.',
+    image: '/assets/images/Anwil.jpeg',
+    sample: '/assets/images/Anwil.jpeg',
+  },
 ];
 
 const About: React.FC = () => {
